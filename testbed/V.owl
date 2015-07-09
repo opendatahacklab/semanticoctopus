@@ -32,7 +32,7 @@
 
     <!-- http://opendatahacklab.github.io/semanticoctopus/testbed/V.owl/relative -->
 
-    <owl:ObjectProperty rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/V.owl/relative">
+    <owl:ObjectProperty rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/relative">
         <rdf:type rdf:resource="&owl;TransitiveProperty"/>
     </owl:ObjectProperty>
 </rdf:RDF>

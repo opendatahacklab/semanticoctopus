@@ -36,8 +36,8 @@
 
     <!-- http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl/a -->
 
-    <owl:NamedIndividual rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/a">
-        <testbed:relative rdf:resource="http://opendatahacklab.github.io/semanticoctopus/testbed/b"/>
+    <owl:NamedIndividual rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/b">
+        <testbed:relative rdf:resource="http://opendatahacklab.github.io/semanticoctopus/testbed/c"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 
