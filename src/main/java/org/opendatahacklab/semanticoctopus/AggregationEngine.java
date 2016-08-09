@@ -3,6 +3,9 @@ package org.opendatahacklab.semanticoctopus;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.jena.fuseki.jetty.JettyFuseki;
+import org.apache.jena.fuseki.jetty.JettyServerConfig;
+import org.apache.jena.fuseki.server.FusekiServer;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -18,6 +21,7 @@ public class AggregationEngine {
 
 	private final URL ontologyURL;
 	private final Model model;
+	private Thread serverThread;
 
 	/**
 	 * 
@@ -44,9 +48,6 @@ public class AggregationEngine {
 		final URL ontologyURL = new URL("http://protege.stanford.edu/ontologies/pizza/pizza.owl");
 		final AggregationEngine e = new AggregationEngine(ontologyURL);
 		e.load();
-
-		// TODO Auto-generated method stub
-
 	}
 
 }
