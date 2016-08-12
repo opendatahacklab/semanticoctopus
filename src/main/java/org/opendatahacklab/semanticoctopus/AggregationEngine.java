@@ -43,7 +43,7 @@ public class AggregationEngine {
 		this.ontologyURLs = ontologyURLs2;
 		this.model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 	}
-
+	
 	/**
 	 * Load the triples from the remote ontology URL.
 	 */
@@ -85,28 +85,23 @@ public class AggregationEngine {
 		
 		final AggregationEngine e = new AggregationEngine(ontologyURLs);
 		e.load();
-		e.sparql();
+		String query1=" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX my: <http://www.semanticweb.org/rohit/ontologies/2014/4/untitled-ontology-10#> SELECT  ?ind WHERE { ?ind rdf:type my:Student .}";
+    	e.execQuery(query1);
 		//e.createFile();
 	}
-	private void sparql(){
-		
-		String query1=" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX my: <http://www.semanticweb.org/rohit/ontologies/2014/4/untitled-ontology-10#> SELECT  ?ind WHERE { ?ind rdf:type my:Student .}";
-    	Query query= QueryFactory.create(query1);
-        QueryExecution exe=QueryExecutionFactory.create(query, model);
-        
-        /*
-        String term = "Honda_Legend";
-		String endpointsSparql = "PREFIX dbp: <http://dbpedia.org/resource/>"+
-				   "PREFIX dbp2: <http://dbpedia.org/ontology/>"+
-				   "SELECT ?abstract"+
-				   "WHERE {"+
-				   "   dbp:"+term+" dbp2:abstract ?abstract."+
-				   "}";
-		 QueryExecution x = QueryExecutionFactory.sparqlService(ontology_service, String.format(endpointsSparql));
-		 */
-        
-         System.out.println("X:"+exe);
-		 ResultSet results = exe.execSelect();
-		 ResultSetFormatter.out(System.out, results);
+	/**
+	 * @param String query
+	 * @return
+	 */
+	public ResultSet execQuery(String query){
+		Query query1= QueryFactory.create(query);
+        QueryExecution exe=QueryExecutionFactory.create(query1, model);
+		ResultSet results = exe.execSelect();
+		ResultSetFormatter.out(System.out, results);
+		return results;
 	}
 }
+
+
+
+
