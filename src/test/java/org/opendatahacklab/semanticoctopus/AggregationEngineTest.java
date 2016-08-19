@@ -57,7 +57,7 @@ public class AggregationEngineTest {
 	 * 
 	 */
 	public AggregationEngineTest() throws MalformedURLException {
-		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");		
+		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");
 		ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
 		ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
@@ -71,17 +71,19 @@ public class AggregationEngineTest {
 	 * Perform a query about relatives against the ontology obtained by
 	 * aggregating a set of ontologies.
 	 * 
-	 * @param ontologies URL of the ontologies to be aggregated
-	 * @param expected pairs expected to be returned as result of the relative query
+	 * @param ontologies
+	 *            URL of the ontologies to be aggregated
+	 * @param expected
+	 *            pairs expected to be returned as result of the relative query
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
 		final AggregationEngine engine = new AggregationEngine(ontologies);
 		engine.write();
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
-		while(expectedIt.hasNext()){
+		while (expectedIt.hasNext()) {
 			final RelativePair expectedPair = expectedIt.next();
-			System.out.println(expectedPair.x+" "+expectedPair.y);
+			System.out.println(expectedPair.x + " " + expectedPair.y);
 			assertTrue("Too less pairs returned", actual.hasNext());
 			final QuerySolution actualPair = actual.next();
 			assertEquals(expectedPair.x, actualPair.get("x").asResource().getURI());
@@ -90,8 +92,10 @@ public class AggregationEngineTest {
 		assertFalse("Too much pairs returned", actual.hasNext());
 	}
 
+	// SIMPLE QUERIES
+
 	/**
-	 * Conveniente method
+	 * Convenience method
 	 * 
 	 * @param ontologies
 	 * @param expected
@@ -99,7 +103,7 @@ public class AggregationEngineTest {
 	private void testRelatives(final URL[] ontologies, final RelativePair[] expected) {
 		testRelatives(Arrays.asList(ontologies), Arrays.asList(expected));
 	}
-	
+
 	/**
 	 * Check that if not ontology is provided as argument, the resulting
 	 * ontology is empty.
@@ -114,8 +118,8 @@ public class AggregationEngineTest {
 	 */
 	@Test
 	public void shouldLoadOneOntologyWithARelativeAssertion() {
-		final URL[] ontologies = {ontologyA};
-		final RelativePair[] expected = {new RelativePair(individualA, individualB)};
+		final URL[] ontologies = { ontologyA };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
 		testRelatives(ontologies, expected);
 	}
 
@@ -124,10 +128,91 @@ public class AggregationEngineTest {
 	 */
 	@Test
 	public void shouldLoadSeveralOntologiesWithSeveralRelativeAssertions() {
-		final URL[] ontologies = {ontologyA, ontologyB, ontologyC};
-		final RelativePair[] expected = {new RelativePair(individualA, individualB),
-				new RelativePair(individualB, individualC),
-				new RelativePair(individualC, individualD)};
+		final URL[] ontologies = { ontologyA, ontologyB, ontologyC };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB),
+				new RelativePair(individualB, individualC), new RelativePair(individualC, individualD) };
+		testRelatives(ontologies, expected);
+	}
+
+	// REASONING
+
+	/**
+	 * Test that no inference is performed when just the ontology A is loaded
+	 */
+	@Test
+	public void shouldInferNoTuplesWithA() {
+		final URL[] ontologies = { vocabulary, ontologyA };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
+		testRelatives(ontologies, expected);
+
+	}
+
+	/**
+	 * Test that no inference is performed when just the ontology B is loaded
+	 */
+	@Test
+	public void shouldInferNoTuplesWithB() {
+		final URL[] ontologies = { vocabulary, ontologyB };
+		final RelativePair[] expected = { new RelativePair(individualB, individualC) };
+		testRelatives(ontologies, expected);
+
+	}
+
+	/**
+	 * Test that no inference is performed when just the ontology C is loaded
+	 */
+	@Test
+	public void shouldInferNoTuplesWithC() {
+		final URL[] ontologies = { vocabulary, ontologyC };
+		final RelativePair[] expected = { new RelativePair(individualC, individualD) };
+		testRelatives(ontologies, expected);
+
+	}
+
+	/**
+	 * Test that inferences are performed when loading ontology A and ontology B
+	 */
+	@Test
+	public void shouldInferTuplesWithAB() {
+		final URL[] ontologies = { vocabulary, ontologyA, ontologyB };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB),
+				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC) };
+		testRelatives(ontologies, expected);
+	}
+
+	/**
+	 * Test that no inference is performed when ontologies A and C are loaded
+	 */
+	@Test
+	public void shouldInferNoTuplesWithAC() {
+		final URL[] ontologies = { vocabulary, ontologyA, ontologyC };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB),
+				new RelativePair(individualC, individualD) };
+		testRelatives(ontologies, expected);
+
+	}
+
+	/**
+	 * Test that inferences are performed when loading ontology B and ontology C
+	 */
+	@Test
+	public void shouldInferTuplesWithBC() {
+		final URL[] ontologies = { vocabulary, ontologyB, ontologyC };
+		final RelativePair[] expected = { new RelativePair(individualB, individualC),
+				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
+		testRelatives(ontologies, expected);
+	}
+
+	/**
+	 * Test that inferences are performed when loading ontology A and ontology B
+	 * and ontology C
+	 */
+	@Test
+	public void shouldInferTuplesWithABC() {
+		final URL[] ontologies = { vocabulary, ontologyA, ontologyB, ontologyC };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB),
+				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC),
+				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
 	}
 
