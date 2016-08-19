@@ -3,15 +3,15 @@
  */
 package org.opendatahacklab.semanticoctopus;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -76,14 +76,16 @@ public class AggregationEngineTest {
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
 		final AggregationEngine engine = new AggregationEngine(ontologies);
+		engine.write();
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
 		while(expectedIt.hasNext()){
-			assertTrue("Too less pairs returned", actual.hasNext());
 			final RelativePair expectedPair = expectedIt.next();
+			System.out.println(expectedPair.x+" "+expectedPair.y);
+			assertTrue("Too less pairs returned", actual.hasNext());
 			final QuerySolution actualPair = actual.next();
-			assertEquals(expectedPair.x, actualPair.get("x"));
-			assertEquals(expectedPair.y, actualPair.get("y"));
+			assertEquals(expectedPair.x, actualPair.get("x").asResource().getURI());
+			assertEquals(expectedPair.y, actualPair.get("y").asResource().getURI());
 		}
 		assertFalse("Too much pairs returned", actual.hasNext());
 	}
