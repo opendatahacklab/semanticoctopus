@@ -6,19 +6,19 @@
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY V "http://opendatahacklab.github.io/semanticoctopus/testbed/V.owl/" >
+    <!ENTITY V "http://opendatahacklab.org/semanticoctopus/testbed/V.owl/" >
 ]>
 
 
-<rdf:RDF xmlns="http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl#"
-     xml:base="http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl"
+<rdf:RDF xmlns="http://opendatahacklab.org/semanticoctopus/testbed/B.owl#"
+     xml:base="http://opendatahacklab.org/semanticoctopus/testbed/B.owl"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:testbed="http://opendatahacklab.github.io/semanticoctopus/testbed/"
+     xmlns:testbed="http://opendatahacklab.org/semanticoctopus/testbed/"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <owl:Ontology rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl">
-        <owl:imports rdf:resource="http://opendatahacklab.github.io/semanticoctopus/testbed/V.owl"/>
+    <owl:Ontology rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/A.owl">
+        <owl:imports rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/V.owl"/>
     </owl:Ontology>
     
 
@@ -34,10 +34,10 @@
     
 
 
-    <!-- http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl/a -->
+    <!-- http://opendatahacklab.org/semanticoctopus/testbed/A.owl/a -->
 
-    <owl:NamedIndividual rdf:about="http://opendatahacklab.github.io/semanticoctopus/testbed/b">
-        <testbed:relative rdf:resource="http://opendatahacklab.github.io/semanticoctopus/testbed/c"/>
+    <owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/b">
+        <testbed:relative rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/c"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 
