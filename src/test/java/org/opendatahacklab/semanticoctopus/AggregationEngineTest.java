@@ -83,7 +83,6 @@ public class AggregationEngineTest {
 		final Iterator<RelativePair> expectedIt = expected.iterator();
 		while (expectedIt.hasNext()) {
 			final RelativePair expectedPair = expectedIt.next();
-			System.out.println(expectedPair.x + " " + expectedPair.y);
 			assertTrue("Too less pairs returned", actual.hasNext());
 			final QuerySolution actualPair = actual.next();
 			assertEquals(expectedPair.x, actualPair.get("x").asResource().getURI());
@@ -92,7 +91,6 @@ public class AggregationEngineTest {
 		assertFalse("Too much pairs returned", actual.hasNext());
 	}
 
-	// SIMPLE QUERIES
 
 	/**
 	 * Convenience method
@@ -103,6 +101,8 @@ public class AggregationEngineTest {
 	private void testRelatives(final URL[] ontologies, final RelativePair[] expected) {
 		testRelatives(Arrays.asList(ontologies), Arrays.asList(expected));
 	}
+
+	// SIMPLE QUERIES
 
 	/**
 	 * Check that if not ontology is provided as argument, the resulting
