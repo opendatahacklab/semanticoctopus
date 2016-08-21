@@ -26,10 +26,14 @@
 			<version>4.12</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>apache-jena-libs</artifactId>
-			<version>3.1.0</version>
-			<type>pom</type>
+			<groupId>com.github.ansell.pellet</groupId>
+			<artifactId>pellet-jena</artifactId>
+			<version>2.3.6-ansell</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.pellet</groupId>
+			<artifactId>pellet-query</artifactId>
+			<version>2.3.6-ansell</version>
 		</dependency>
 	</dependencies>
 </project>

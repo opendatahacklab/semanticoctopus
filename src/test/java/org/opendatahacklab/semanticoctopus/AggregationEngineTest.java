@@ -12,10 +12,10 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
 import org.junit.Test;
+
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 
 /**
  * Test cases for the {@link AggregationEngine}
@@ -82,6 +82,7 @@ public class AggregationEngineTest {
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
 		while (expectedIt.hasNext()) {
+			System.out.println("---");
 			final RelativePair expectedPair = expectedIt.next();
 			assertTrue("Too less pairs returned", actual.hasNext());
 			final QuerySolution actualPair = actual.next();

@@ -5,15 +5,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.mindswap.pellet.jena.PelletReasonerFactory;
+import com.hp.hpl.jena.reasoner.Reasoner;
 
 /**
  * Download an ontology from the internet, perform reasoning and provide a
@@ -32,9 +33,8 @@ public class AggregationEngine {
 	 */
 	public AggregationEngine(final List<URL> ontologyURLs) {
 		this.ontologyURLs = Collections.unmodifiableList(ontologyURLs);
-		final OntModel baseModel = download(ontologyURLs);
-		this.model = baseModel;
-		this.model.rebind();
+		this.model = download(ontologyURLs);
+		addInferences(this.model);
 	}
 
 	/**
@@ -44,14 +44,24 @@ public class AggregationEngine {
 	 * @return
 	 */
 	private OntModel download(final List<URL> ontologyURLs) {
-		final OntModel baseModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		final OntModel baseModel = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
 		for (URL u : ontologyURLs) {
 			System.out.println("Loading " + u.toExternalForm());
-			this.model.read(u.toExternalForm(), null);
+			baseModel.read(u.toExternalForm());
 		}
 		return baseModel;
 	}
-	
+
+	/**
+	 * Extract inferred statements from the given ontology.
+	 * 
+	 * @param baseModel
+	 * @return
+	 */
+	private void addInferences(final OntModel baseModel) {
+		baseModel.rebind();
+	}
+
 	/**
 	 * Write the ontology on the standard output
 	 */
@@ -77,19 +87,19 @@ public class AggregationEngine {
 
 		final AggregationEngine e = new AggregationEngine(ontologyURLs);
 		String query1 = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX my: <http://www.semanticweb.org/rohit/ontologies/2014/4/untitled-ontology-10#> SELECT  ?ind WHERE { ?ind rdf:type my:Student .}";
-		e.execQuery(query1);
+		// e.execQuery(query1);
 		// e.createFile();
 	}
 
 	/**
+	 * Perform a query against the aggregated ontology
+	 * 
 	 * @param String
 	 *            query
 	 * @return
 	 */
-	public ResultSet execQuery(String query) {
-		Query query1 = QueryFactory.create(query);
-		QueryExecution exe = QueryExecutionFactory.create(query1, model);
-		ResultSet results = exe.execSelect();
-		return results;
+	public ResultSet execQuery(final String query) {
+		final QueryExecution exe = QueryExecutionFactory.create(QueryFactory.create(query), model);
+		return exe.execSelect();
 	}
 }
