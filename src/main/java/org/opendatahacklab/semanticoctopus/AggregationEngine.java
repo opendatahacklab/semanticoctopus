@@ -5,16 +5,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.hp.hpl.jena.query.Query;
+
+import org.mindswap.pellet.jena.PelletReasonerFactory;
+
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-
-import org.mindswap.pellet.jena.PelletReasonerFactory;
-import com.hp.hpl.jena.reasoner.Reasoner;
 
 /**
  * Download an ontology from the internet, perform reasoning and provide a
@@ -34,7 +33,6 @@ public class AggregationEngine {
 	public AggregationEngine(final List<URL> ontologyURLs) {
 		this.ontologyURLs = Collections.unmodifiableList(ontologyURLs);
 		this.model = download(ontologyURLs);
-		addInferences(this.model);
 	}
 
 	/**
@@ -50,16 +48,6 @@ public class AggregationEngine {
 			baseModel.read(u.toExternalForm());
 		}
 		return baseModel;
-	}
-
-	/**
-	 * Extract inferred statements from the given ontology.
-	 * 
-	 * @param baseModel
-	 * @return
-	 */
-	private void addInferences(final OntModel baseModel) {
-		baseModel.rebind();
 	}
 
 	/**
