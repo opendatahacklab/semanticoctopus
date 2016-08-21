@@ -24,24 +24,6 @@
 	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/a">
 		<rdf:type rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/A" />
 	</owl:NamedIndividual>
-	
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Object Properties
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-    
-
-
-    <!-- http://opendatahacklab.org/semanticoctopus/testbed/V.owl/relative -->
-
-    <owl:ObjectProperty rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/relative">
-        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
-    </owl:ObjectProperty>
 </rdf:RDF>
 
 
