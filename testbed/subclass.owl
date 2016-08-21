@@ -18,7 +18,7 @@
     <owl:Ontology rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/subclass.owl"/>
     
 	<rdfs:Class rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/A">
-		<rdfs:subClassOf rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/B" />
+		<rdfs:subClassOf rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/B" />
 	</rdfs:Class>
 	
 	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/a">
