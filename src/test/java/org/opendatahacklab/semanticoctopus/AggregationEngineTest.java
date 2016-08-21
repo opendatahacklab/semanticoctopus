@@ -81,15 +81,16 @@ public class AggregationEngineTest {
 		engine.write();
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
+		int n = 0;
 		while (expectedIt.hasNext()) {
-			System.out.println("---");
+			n++;
 			final RelativePair expectedPair = expectedIt.next();
-			assertTrue("Too less pairs returned", actual.hasNext());
+			assertTrue("Too less pairs returned rows="+n, actual.hasNext());
 			final QuerySolution actualPair = actual.next();
-			assertEquals(expectedPair.x, actualPair.get("x").asResource().getURI());
-			assertEquals(expectedPair.y, actualPair.get("y").asResource().getURI());
+			assertEquals("row="+n, expectedPair.x, actualPair.get("x").asResource().getURI());
+			assertEquals("row="+n, expectedPair.y, actualPair.get("y").asResource().getURI());
 		}
-		assertFalse("Too much pairs returned", actual.hasNext());
+		assertFalse("Too much pairs returned. Rows="+n, actual.hasNext());
 	}
 
 
