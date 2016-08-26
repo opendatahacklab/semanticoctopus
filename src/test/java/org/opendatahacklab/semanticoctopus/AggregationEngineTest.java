@@ -84,7 +84,7 @@ public class AggregationEngineTest {
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
 		final AggregationEngine engine = new AggregationEngine(ontologies);
-		engine.write();
+		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
 		int n = 0;
@@ -230,7 +230,7 @@ public class AggregationEngineTest {
 	@Test
 	public void shouldInferMemberOfSuperclasses() {
 		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubclass));
-		engine.write();
+		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
 		final String resultItem = actual.next().getResource("?x").getURI();
@@ -244,7 +244,7 @@ public class AggregationEngineTest {
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() {
 		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubproperty));
-		engine.write();
+		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
 				+ "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());

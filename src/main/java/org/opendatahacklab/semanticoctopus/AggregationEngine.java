@@ -1,5 +1,8 @@
 package org.opendatahacklab.semanticoctopus;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,8 +54,11 @@ public class AggregationEngine {
 	/**
 	 * Write the ontology on the standard output
 	 */
-	public void write() {
-		this.model.write(System.out, "RDF/XML-ABBREV");
+	public void write(final OutputStream out, final String baseUri) {
+		final OutputStreamWriter writer = new OutputStreamWriter(out);
+		this.model.writeAll(writer, "RDF/XML-ABBREV", baseUri);
+//		writer.flush();
+//		writer.close();
 	}
 
 
@@ -85,6 +91,6 @@ public class AggregationEngine {
 			ontologies.add(new URL(ontologyUrl));
 		
 		final AggregationEngine e = new AggregationEngine(ontologies);
-		e.write();
+		e.write(System.out, "http://opendatahacklab.org/");
 	}
 }
