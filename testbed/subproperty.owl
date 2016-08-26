@@ -19,7 +19,7 @@
     <owl:Ontology rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl"/>
     
 	<owl:ObjectProperty rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/p">
-		<rdfs:subClassOf rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/q" />
+		<rdfs:subPropertyOf rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/q" />
 	</owl:ObjectProperty>
 	
 	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/a">
