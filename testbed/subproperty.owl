@@ -22,7 +22,7 @@
 		<rdfs:subClassOf rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/q" />
 	</owl:ObjectProperty>
 	
-	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/A">
-		<testbed:p rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/B" />
+	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/a">
+		<testbed:p rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/b" />
 	</owl:NamedIndividual>
 </rdf:RDF>

@@ -246,11 +246,11 @@ public class AggregationEngineTest {
 		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubproperty));
 		engine.write();
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
-				+ "SELECT ?x ?y { ?x <http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl#q> ?y }  ORDER BY ?x ?y");
+				+ "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
 		final QuerySolution s = actual.next();
-		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/a", s.getResource("?x").getURI());
-		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/b", s.getResource("?y").getURI());
+		assertEquals(individualA, s.getResource("?x").getURI());
+		assertEquals(individualB, s.getResource("?y").getURI());
 		assertFalse(actual.hasNext());
 	}
 
