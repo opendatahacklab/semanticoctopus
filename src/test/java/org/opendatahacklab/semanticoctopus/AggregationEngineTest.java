@@ -50,6 +50,7 @@ public class AggregationEngineTest {
 	private final URL ontologyB;
 	private final URL ontologyC;
 	private final URL ontologySubclass;
+	private final URL ontologySubproperty;
 	private final String individualA;
 	private final String individualB;
 	private final String individualC;
@@ -65,6 +66,7 @@ public class AggregationEngineTest {
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
 		ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
 		ontologySubclass = new URL("http://opendatahacklab.org/semanticoctopus/testbed/subclass.owl");
+		ontologySubproperty = new URL("http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl");
 		individualA = "http://opendatahacklab.org/semanticoctopus/testbed/a";
 		individualB = "http://opendatahacklab.org/semanticoctopus/testbed/b";
 		individualC = "http://opendatahacklab.org/semanticoctopus/testbed/c";
@@ -229,10 +231,27 @@ public class AggregationEngineTest {
 	public void shouldInferMemberOfSuperclasses() {
 		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubclass));
 		engine.write();
-		final ResultSet actual = engine.execQuery(TESTBED_PREFIX+"SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
+		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
 		final String resultItem = actual.next().getResource("?x").getURI();
-		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/a",resultItem);
+		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/a", resultItem);
 		assertFalse(actual.hasNext());
 	}
+
+	/**
+	 * Test for reasoning in presence of subproperty assertion
+	 */
+	@Test
+	public void shouldInferRelationBecauseOfSubproperty() {
+		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubproperty));
+		engine.write();
+		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
+				+ "SELECT ?x ?y { ?x <http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl#q> ?y }  ORDER BY ?x ?y");
+		assertTrue(actual.hasNext());
+		final QuerySolution s = actual.next();
+		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/a", s.getResource("?x").getURI());
+		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/b", s.getResource("?y").getURI());
+		assertFalse(actual.hasNext());
+	}
+
 }

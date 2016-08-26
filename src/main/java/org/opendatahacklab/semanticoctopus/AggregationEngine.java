@@ -43,10 +43,8 @@ public class AggregationEngine {
 	 */
 	private OntModel download(final List<URL> ontologyURLs) {
 		final OntModel baseModel = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
-		for (URL u : ontologyURLs) {
-			System.out.println("Loading " + u.toExternalForm());
+		for (URL u : ontologyURLs)
 			baseModel.read(u.toExternalForm());
-		}
 		return baseModel;
 	}
 
@@ -57,27 +55,6 @@ public class AggregationEngine {
 		this.model.write(System.out, "RDF/XML-ABBREV");
 	}
 
-	/**
-	 * @param args
-	 * @throws MalformedURLException
-	 */
-	public static void main(String[] args) throws MalformedURLException {
-		// URL ontology = new
-		// URL("http://protege.stanford.edu/ontologies/pizza/pizza.owl");
-
-		URL A = new URL("http://opendatahacklab.github.io/semanticoctopus/testbed/A.owl");
-		URL B = new URL("http://opendatahacklab.github.io/semanticoctopus/testbed/B.owl");
-		URL C = new URL("http://opendatahacklab.github.io/semanticoctopus/testbed/C.owl");
-		List<URL> ontologyURLs = new ArrayList<URL>();
-		ontologyURLs.add(A);
-		ontologyURLs.add(B);
-		ontologyURLs.add(C);
-
-		final AggregationEngine e = new AggregationEngine(ontologyURLs);
-		String query1 = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX my: <http://www.semanticweb.org/rohit/ontologies/2014/4/untitled-ontology-10#> SELECT  ?ind WHERE { ?ind rdf:type my:Student .}";
-		// e.execQuery(query1);
-		// e.createFile();
-	}
 
 	/**
 	 * Perform a query against the aggregated ontology
@@ -89,5 +66,25 @@ public class AggregationEngine {
 	public ResultSet execQuery(final String query) {
 		final QueryExecution exe = QueryExecutionFactory.create(QueryFactory.create(query), model);
 		return exe.execSelect();
+	}
+	
+	/**
+	 * Aggregate the ontologies passed as command line parameters. The resulting
+	 * ontology is sent on the standard output.
+	 * 
+	 * @param args
+	 * @throws MalformedURLException
+	 */
+	public static void main(String[] args) throws MalformedURLException {
+		if (args.length<1){
+			System.err.println("Usage: AggregationEngine <ontologyURL1> [<ontologyURL2> [<ontologyURL3> ...]]");
+		}
+		final List<URL> ontologies = new ArrayList<URL>(args.length);
+		
+		for(String ontologyUrl : args)
+			ontologies.add(new URL(ontologyUrl));
+		
+		final AggregationEngine e = new AggregationEngine(ontologies);
+		e.write();
 	}
 }
