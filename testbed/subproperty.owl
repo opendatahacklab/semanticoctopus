@@ -11,17 +11,18 @@
 
 <rdf:RDF xmlns="http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl#"
      xml:base="http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl#"
+     xmlns:testbed="http://opendatahacklab.org/semanticoctopus/testbed/"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <owl:Ontology rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl"/>
     
-	<owl:ObjectProperty rdf:about="p">
-		<rdfs:subClassOf rdf:resource="q" />
+	<owl:ObjectProperty rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/p">
+		<rdfs:subClassOf rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/q" />
 	</owl:ObjectProperty>
 	
 	<owl:NamedIndividual rdf:about="http://opendatahacklab.org/semanticoctopus/testbed/A">
-		<p rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/B" />
+		<testbed:p rdf:resource="http://opendatahacklab.org/semanticoctopus/testbed/B" />
 	</owl:NamedIndividual>
 </rdf:RDF>
