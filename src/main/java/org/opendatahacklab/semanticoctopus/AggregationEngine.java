@@ -29,7 +29,24 @@ public class AggregationEngine {
 
 	private List<URL> ontologyURLs;
 	private final OntModel model;
+	
 
+	public AggregationEngine() {
+		List<URL> ont = new ArrayList<URL>();
+		try {
+			URL ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
+			URL ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
+			URL ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
+			ont.add(ontologyA);
+			ont.add(ontologyB);
+			ont.add(ontologyC);
+		} catch (MalformedURLException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		this.ontologyURLs = Collections.unmodifiableList(ont);
+		this.model = download(ontologyURLs);
+	}
 	/**
 	 * 
 	 */
