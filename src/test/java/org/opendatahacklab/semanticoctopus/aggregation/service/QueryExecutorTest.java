@@ -1,4 +1,4 @@
-package org.opendatahacklab.semanticoctopus.service;
+package org.opendatahacklab.semanticoctopus.aggregation.service;
 
 import java.net.*;
 
@@ -7,6 +7,7 @@ import javax.ws.rs.core.*;
 import org.glassfish.jersey.jdkhttp.*;
 import org.glassfish.jersey.server.*;
 import org.junit.*;
+import org.opendatahacklab.semanticoctopus.service.*;
 
 import com.sun.net.httpserver.*;
 

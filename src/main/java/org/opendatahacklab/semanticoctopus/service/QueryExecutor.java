@@ -1,16 +1,13 @@
 package org.opendatahacklab.semanticoctopus.service;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 
 /**
- * Query executor API
- *
+ * Query executor API.<br>
+ * It uses an instance of {@link QueryExecutorService} to generate a response, containing the result of SELECT query or
+ * an error message, according to the latter and requested output format.
+ * 
  * @author OOL
  */
 @Path("endpoint")
@@ -39,9 +36,9 @@ public class QueryExecutor {
 	@GET
 	@Path("execQuery")
 	public Response executeQueryViaGET(@HeaderParam("Accept") final String acceptedFormat,
-					@QueryParam("query") final String query,
-					@QueryParam("default-graph-uri") final String defaultGraphUri,
-					@QueryParam("named-graph-uri") final String namedGraphUri) {
+			@QueryParam("query") final String query,
+			@QueryParam("default-graph-uri") final String defaultGraphUri,
+			@QueryParam("named-graph-uri") final String namedGraphUri) {
 		throw new RuntimeException("Unimplemented yet!");
 
 		// final Response response = Response.ok("GET: " + query).build();
@@ -59,7 +56,7 @@ public class QueryExecutor {
 	@Consumes("application/x-www-form-urlencoded")
 	@Path("execQuery")
 	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-					final String query) {
+			final String query) {
 		throw new RuntimeException("Unimplemented yet!");
 	}
 
@@ -75,9 +72,9 @@ public class QueryExecutor {
 	@Consumes("application/sparql-query")
 	@Path("execQuery")
 	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-					final String query,
-					@QueryParam("default-graph-uri") final String defaultGraphUri,
-					@QueryParam("named-graph-uri") final String namedGraphUri) {
+			final String query,
+			@QueryParam("default-graph-uri") final String defaultGraphUri,
+			@QueryParam("named-graph-uri") final String namedGraphUri) {
 		throw new RuntimeException("Unimplemented yet!");
 	}
 }

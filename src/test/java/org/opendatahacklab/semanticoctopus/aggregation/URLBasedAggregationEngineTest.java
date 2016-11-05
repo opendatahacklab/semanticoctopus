@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus;
+package org.opendatahacklab.semanticoctopus.aggregation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,18 +13,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.junit.Test;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * Test cases for the {@link AggregationEngine}
+ * Test cases for the {@link URLBasedAggregationEngine}
  * 
  * @author Cristiano Longo
  *
  */
-public class AggregationEngineTest {
+public class URLBasedAggregationEngineTest {
+
 	private static final String TESTBED_PREFIX = "PREFIX testbed:<http://opendatahacklab.org/semanticoctopus/testbed/>\n";
 	private static final String RELATIVES_QUERY = TESTBED_PREFIX
 			+ "SELECT ?x ?y { ?x testbed:relative ?y }  ORDER BY ?x ?y";
@@ -36,6 +38,7 @@ public class AggregationEngineTest {
 	 *
 	 */
 	class RelativePair {
+
 		final String x;
 		final String y;
 
@@ -60,7 +63,7 @@ public class AggregationEngineTest {
 	 * @throws MalformedURLException
 	 * 
 	 */
-	public AggregationEngineTest() throws MalformedURLException {
+	public URLBasedAggregationEngineTest() throws MalformedURLException {
 		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");
 		ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
@@ -74,8 +77,7 @@ public class AggregationEngineTest {
 	}
 
 	/**
-	 * Perform a query about relatives against the ontology obtained by
-	 * aggregating a set of ontologies.
+	 * Perform a query about relatives against the ontology obtained by aggregating a set of ontologies.
 	 * 
 	 * @param ontologies
 	 *            URL of the ontologies to be aggregated
@@ -83,7 +85,7 @@ public class AggregationEngineTest {
 	 *            pairs expected to be returned as result of the relative query
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
-		final AggregationEngine engine = new AggregationEngine(ontologies);
+		final AggregationEngine engine = new URLBasedAggregationEngine(ontologies);
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
@@ -112,8 +114,7 @@ public class AggregationEngineTest {
 	// SIMPLE QUERIES
 
 	/**
-	 * Check that if not ontology is provided as argument, the resulting
-	 * ontology is empty.
+	 * Check that if not ontology is provided as argument, the resulting ontology is empty.
 	 */
 	@Test
 	public void shouldLoadNoOntology() {
@@ -211,8 +212,7 @@ public class AggregationEngineTest {
 	}
 
 	/**
-	 * Test that inferences are performed when loading ontology A and ontology B
-	 * and ontology C
+	 * Test that inferences are performed when loading ontology A and ontology B and ontology C
 	 */
 	@Test
 	public void shouldInferTuplesWithABC() {
@@ -229,7 +229,7 @@ public class AggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferMemberOfSuperclasses() {
-		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubclass));
+		final AggregationEngine engine = new URLBasedAggregationEngine(Collections.singletonList(ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -243,7 +243,7 @@ public class AggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() {
-		final AggregationEngine engine = new AggregationEngine(Collections.singletonList(ontologySubproperty));
+		final AggregationEngine engine = new URLBasedAggregationEngine(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
 				+ "SELECT ?x ?y { ?x testbed:q ?y }");
