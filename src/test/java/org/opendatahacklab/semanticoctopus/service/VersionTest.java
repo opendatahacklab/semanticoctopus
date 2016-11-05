@@ -1,20 +1,17 @@
 package org.opendatahacklab.semanticoctopus.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import java.net.URI;
+import java.net.*;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.*;
 
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.Test;
+import org.glassfish.jersey.jdkhttp.*;
+import org.glassfish.jersey.server.*;
+import org.junit.*;
 
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 
 /**
  * Test class for {@link Version}
@@ -28,14 +25,19 @@ public class VersionTest {
 	private static final String HOST = "http://localhost/";
 	private static final int PORT = 9876;
 
-	/**
-	 * @param baseUri
-	 */
-	private HttpServer prepareServer(final URI baseUri) {
-		final ResourceConfig config = new ResourceConfig(Version.class);
-		final HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
+	private static UriBuilder baseBuilder;
+	private static HttpServer server;
 
-		return server;
+	/**
+	 * Prepares base URI, then opens and starts server
+	 */
+	@BeforeClass
+	public static void prepareServer() {
+		baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
+		final URI baseUri = baseBuilder.build();
+
+		final ResourceConfig config = new ResourceConfig(Version.class);
+		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 	}
 
 	/**
@@ -46,8 +48,8 @@ public class VersionTest {
 		final Client client = ClientBuilder.newClient();
 
 		final WebTarget resourceTarget = client.target(baseUri);
-		final Invocation invocation = resourceTarget.request("text/plain")// header("Foo", "bar")
-						.buildGet();
+		final Invocation invocation = resourceTarget.request("text/plain")
+				.buildGet();
 		return invocation;
 	}
 
@@ -56,16 +58,19 @@ public class VersionTest {
 	 */
 	@Test
 	public void testGetVersion() {
-		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
-
-		final URI baseUri = baseBuilder.build();
-		final HttpServer server = prepareServer(baseUri);
-
 		final URI targetUri = baseBuilder.path("version").build();
 		final Invocation client = prepareClient(targetUri);
 
 		final String version = client.invoke(String.class);
 
 		assertEquals(Version.VERSION, version);
+	}
+
+	/**
+	 * Stops and destroy server
+	 */
+	@AfterClass
+	public static void disposeServer() {
+		server.stop(0);
 	}
 }

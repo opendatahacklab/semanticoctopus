@@ -1,14 +1,14 @@
 package org.opendatahacklab.semanticoctopus.service;
 
-import java.net.URI;
+import java.net.*;
 
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.*;
 
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.Test;
+import org.glassfish.jersey.jdkhttp.*;
+import org.glassfish.jersey.server.*;
+import org.junit.*;
 
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 
 /**
  * Test class for {@link QueryExecutor}
@@ -31,14 +31,19 @@ public class QueryExecutorTest {
 	private static final String SPARQL_XML = "application/sparql-results+xml";
 	private static final String XML = "application/xml";
 
-	/**
-	 * @param baseUri
-	 */
-	private HttpServer prepareServer(final URI baseUri) {
-		final ResourceConfig config = new ResourceConfig(QueryExecutor.class);
-		final HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
+	private static UriBuilder baseBuilder;
+	private static HttpServer server;
 
-		return server;
+	/**
+	 * Prepares base URI, then opens and starts server
+	 */
+	@BeforeClass
+	public static void prepareServer() {
+		baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
+		final URI baseUri = baseBuilder.build();
+
+		final ResourceConfig config = new ResourceConfig(QueryExecutor.class);
+		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 	}
 
 	// /**
@@ -60,10 +65,6 @@ public class QueryExecutorTest {
 	 */
 	@Test
 	public void testQueryExecutionGET() {
-		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
-
-		final URI baseUri = baseBuilder.build();
-		final HttpServer server = prepareServer(baseUri);
 
 		final URI targetUri = baseBuilder.path("endpoint/execQuery").build();
 		// final Invocation client = prepareClientGET(targetUri);
@@ -71,5 +72,13 @@ public class QueryExecutorTest {
 		// final String query = client.invoke(String.class);
 		//
 		// assertEquals(Version.VERSION, version);
+	}
+
+	/**
+	 * Stops and destroy server
+	 */
+	@AfterClass
+	public static void disposeServer() {
+		server.stop(0);
 	}
 }
