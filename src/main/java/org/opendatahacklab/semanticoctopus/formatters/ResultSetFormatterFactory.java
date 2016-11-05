@@ -1,7 +1,17 @@
 package org.opendatahacklab.semanticoctopus.formatters;
 
-import java.util.HashMap;
+import static com.hp.hpl.jena.sparql.resultset.ResultSetFormat.syntaxCSV;
+import static com.hp.hpl.jena.sparql.resultset.ResultSetFormat.syntaxJSON;
+import static com.hp.hpl.jena.sparql.resultset.ResultSetFormat.syntaxRDF_XML;
+import static com.hp.hpl.jena.sparql.resultset.ResultSetFormat.syntaxTSV;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.util.Hashtable;
 import java.util.Map;
+
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 
 /**
  * A factory of {@link ResultSetFormatter}s based on mime-type
@@ -10,14 +20,21 @@ import java.util.Map;
  */
 public class ResultSetFormatterFactory {
 
-	// Map from mime-types to formatters
-	private static Map<String, ResultSetFormatter> formatters;
+	// Map from mime-types into formats
+	private static Map<String, ResultSetFormat> formats = new Hashtable<String, ResultSetFormat>() {
 
-	static {
-		formatters = new HashMap<>();
-		for (final ResultSetFormatter formatter : MimeTypeBasedFormatter.values())
-			formatters.put(formatter.getMimeType(), formatter);
-	}
+		private static final long serialVersionUID = -831687800070232103L;
+
+		{
+			put("text/csv",syntaxCSV);
+			put("text/tab-separated-values",syntaxTSV);
+			put("application/sparql-results+json",syntaxJSON);
+			put("application/json",syntaxJSON);
+			put("application/sparql-results+xml",syntaxRDF_XML);
+			put("application/xml",syntaxRDF_XML);
+		}
+	};
+
 
 	/**
 	 * Builds a {@link ResultSetFormatter} according to specified mime-type.<br>
@@ -33,11 +50,29 @@ public class ResultSetFormatterFactory {
 	 *             when mime-type is not accepted in the context of SPARQL SELECT queries
 	 */
 	public static ResultSetFormatter createFormatter(final String mimeType) throws IllegalMimeTypeException {
-		final ResultSetFormatter resultSetFormatter = formatters.get(mimeType);
+		// final ResultSetFormatter resultSetFormatter = formatters.get(mimeType);
+		//
+		// if (resultSetFormatter != null)
+		// return resultSetFormatter;
+		// else
+		// throw new IllegalMimeTypeException(mimeType);
+		throw new RuntimeException("Unimplemented yet!");
+	}
 
-		if (resultSetFormatter != null)
-			return resultSetFormatter;
-		else
-			throw new IllegalMimeTypeException(mimeType);
+	/**
+	 * Formats specified result set according to a certain syntax
+	 * 
+	 * @param resultSet
+	 * @param format
+	 *            Format related to syntax
+	 * 
+	 * @return A string representing the result set in requested format
+	 */
+	private String formatResult(final ResultSet resultSet, final ResultSetFormat format) {
+		final OutputStream outputStream = new ByteArrayOutputStream();
+		com.hp.hpl.jena.query.ResultSetFormatter.output(outputStream, resultSet, format);
+		final String formattedResultSet = outputStream.toString();
+
+		return formattedResultSet;
 	}
 }
