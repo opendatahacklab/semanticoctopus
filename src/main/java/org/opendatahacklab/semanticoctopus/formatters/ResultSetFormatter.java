@@ -1,4 +1,4 @@
-package org.opendatahacklab.semanticoctopus.service;
+package org.opendatahacklab.semanticoctopus.formatters;
 
 import com.hp.hpl.jena.query.*;
 

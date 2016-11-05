@@ -4,6 +4,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 
 import com.hp.hpl.jena.query.ResultSet;
 

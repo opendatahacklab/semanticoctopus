@@ -11,9 +11,9 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Test;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorService;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorService;
-import org.opendatahacklab.semanticoctopus.service.ResultSetFormatter;
 
 import com.hp.hpl.jena.query.ResultSet;
 
