@@ -1,14 +1,21 @@
 package org.opendatahacklab.semanticoctopus.aggregation;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.mindswap.pellet.jena.*;
+import org.mindswap.pellet.jena.PelletReasonerFactory;
 
-import com.hp.hpl.jena.ontology.*;
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * Download an ontology from the internet, perform reasoning and provide a sparql endpoint.
