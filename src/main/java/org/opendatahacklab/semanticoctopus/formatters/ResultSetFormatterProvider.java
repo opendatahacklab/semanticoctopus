@@ -8,7 +8,7 @@ import java.util.Map;
  *
  * @author OOL
  */
-public class ResultSetFormatterFactory {
+public class ResultSetFormatterProvider {
 
 	// Map from mime-types to formatters
 	private static Map<String, ResultSetFormatter> formatters;
@@ -21,7 +21,7 @@ public class ResultSetFormatterFactory {
 	}
 
 	/**
-	 * Builds a {@link ResultSetFormatter} according to specified mime-type.<br>
+	 * Obtains a {@link ResultSetFormatter} according to specified mime-type.<br>
 	 * Accepted mime-types are: <code>text/csv</code>, <code>text/tab-separated-values<code></code>,
 	 * <code>application/sparql-results+json</code>,<code>application/json</code>,
 	 * <code>application/sparql-results+xml</code>,<code>application/xml</code>
@@ -33,7 +33,7 @@ public class ResultSetFormatterFactory {
 	 * @throws IllegalMimeTypeException
 	 *             when mime-type is not accepted in the context of SPARQL SELECT queries
 	 */
-	public static ResultSetFormatter createFormatter(final String mimeType) throws IllegalMimeTypeException {
+	public static ResultSetFormatter getFormatter(final String mimeType) throws IllegalMimeTypeException {
 		final ResultSetFormatter resultSetFormatter = formatters.get(mimeType);
 
 		if (resultSetFormatter != null)

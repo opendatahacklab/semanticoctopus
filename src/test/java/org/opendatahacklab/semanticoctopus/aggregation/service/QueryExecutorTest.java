@@ -1,15 +1,17 @@
 package org.opendatahacklab.semanticoctopus.aggregation.service;
 
-import java.net.*;
+import java.net.URI;
 
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.jersey.jdkhttp.*;
-import org.glassfish.jersey.server.*;
-import org.junit.*;
-import org.opendatahacklab.semanticoctopus.service.*;
+import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.opendatahacklab.semanticoctopus.service.QueryExecutor;
 
-import com.sun.net.httpserver.*;
+import com.sun.net.httpserver.HttpServer;
 
 /**
  * Test class for {@link QueryExecutor}
@@ -67,7 +69,7 @@ public class QueryExecutorTest {
 	@Test
 	public void testQueryExecutionGET() {
 
-		final URI targetUri = baseBuilder.path("endpoint/execQuery").build();
+		final URI targetUri = baseBuilder.path("sparql").build();
 		// final Invocation client = prepareClientGET(targetUri);
 		//
 		// final String query = client.invoke(String.class);

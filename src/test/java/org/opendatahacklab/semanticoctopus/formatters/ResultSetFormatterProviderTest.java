@@ -15,11 +15,11 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 
 /**
- * Test class of {@link ResultSetFormatterFactory}
+ * Test class of {@link ResultSetFormatterProvider}
  *
  * @author OOL
  */
-public class ResultSetFormatterFactoryTest {
+public class ResultSetFormatterProviderTest {
 
 	// Testbed
 	private static final String CSV_MT = "text/csv";
@@ -130,7 +130,7 @@ public class ResultSetFormatterFactoryTest {
 	 */
 	@Test(expected = IllegalMimeTypeException.class)
 	public void shouldRaiseExceptionOnIllegalMimeType() throws IllegalMimeTypeException {
-		ResultSetFormatterFactory.createFormatter(TEXT_MT);
+		ResultSetFormatterProvider.getFormatter(TEXT_MT);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class ResultSetFormatterFactoryTest {
 	 */
 	private void checkFormatter(final String mimeType, final ResultSet resultSet, final String expectedFormattedResult)
 			throws IllegalMimeTypeException {
-		final ResultSetFormatter testSubject = ResultSetFormatterFactory.createFormatter(mimeType);
+		final ResultSetFormatter testSubject = ResultSetFormatterProvider.getFormatter(mimeType);
 		assertEquals("Wrong mime type", mimeType, testSubject.getMimeType());
 
 		final String formattedResult = testSubject.format(resultSet);
