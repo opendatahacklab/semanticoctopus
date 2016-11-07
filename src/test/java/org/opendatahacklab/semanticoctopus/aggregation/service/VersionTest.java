@@ -1,18 +1,23 @@
 package org.opendatahacklab.semanticoctopus.aggregation.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.net.*;
+import java.net.URI;
 
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.jersey.jdkhttp.*;
-import org.glassfish.jersey.server.*;
-import org.junit.*;
-import org.opendatahacklab.semanticoctopus.service.*;
+import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.opendatahacklab.semanticoctopus.service.Version;
 
-import com.sun.net.httpserver.*;
+import com.sun.net.httpserver.HttpServer;
 
 /**
  * Test class for {@link Version}
@@ -37,7 +42,8 @@ public class VersionTest {
 		baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
 		final URI baseUri = baseBuilder.build();
 
-		final ResourceConfig config = new ResourceConfig(Version.class);
+		final ResourceConfig config = new ResourceConfig(); // Version.class);
+		config.registerInstances(new Version());
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 	}
 
@@ -50,7 +56,7 @@ public class VersionTest {
 
 		final WebTarget resourceTarget = client.target(baseUri);
 		final Invocation invocation = resourceTarget.request("text/plain")
-				.buildGet();
+						.buildGet();
 		return invocation;
 	}
 
