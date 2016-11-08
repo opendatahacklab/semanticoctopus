@@ -45,7 +45,6 @@ public class QueryExecutorTest {
 	private static final String MIME_TYPE = "text/plain";
 	private static final Response RESPONSE = mock(Response.class);
 
-
 	private QueryExecutor createTestSubject(final QueryExecutorServiceFactory serviceFactory) {
 		return new QueryExecutor(serviceFactory);
 	}
@@ -78,7 +77,7 @@ public class QueryExecutorTest {
 	 * @throws IllegalMimeTypeException
 	 */
 	private QueryExecutorServiceFactory createServiceFactory(final QueryExecutorService service, final String mimeType)
-					throws IllegalMimeTypeException {
+			throws IllegalMimeTypeException {
 		final QueryExecutorServiceFactory serviceFactory = mock(QueryExecutorServiceFactory.class);
 		when(serviceFactory.createService((String) null)).thenThrow(new IllegalMimeTypeException(mimeType));
 		when(serviceFactory.createService(mimeType)).thenReturn(service);
@@ -100,10 +99,10 @@ public class QueryExecutorTest {
 	 * @throws IllegalArgumentException
 	 */
 	private Builder prepareInvocationBuilder(final String mimeType, final String query)
-					throws IllegalArgumentException, UriBuilderException, UnsupportedEncodingException {
+			throws IllegalArgumentException, UriBuilderException, UnsupportedEncodingException {
 		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
 		final URI targetUri = baseBuilder.path(QueryExecutor.ENDPOINT_NAME)
-						.queryParam(QUERY_PARAM, URLEncoder.encode(query, "UTF-8")).build();
+				.queryParam(QUERY_PARAM, URLEncoder.encode(query, "UTF-8").replace("+", "%20")).build();
 
 		final Client client = ClientBuilder.newClient();
 		final WebTarget resourceTarget = client.target(targetUri);
@@ -127,7 +126,7 @@ public class QueryExecutorTest {
 	 */
 	@Test
 	public void testQueryExecutionGET() throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
-	UnsupportedEncodingException {
+			UnsupportedEncodingException {
 		final QueryExecutorService service = createService();
 		final QueryExecutorServiceFactory serviceFactory = createServiceFactory(service, MIME_TYPE);
 		final QueryExecutor testSubject = createTestSubject(serviceFactory);
