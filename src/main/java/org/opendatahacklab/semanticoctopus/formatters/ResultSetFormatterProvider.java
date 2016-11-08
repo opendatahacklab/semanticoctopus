@@ -25,15 +25,15 @@ public class ResultSetFormatterProvider {
 	 * Accepted mime-types are: <code>text/csv</code>, <code>text/tab-separated-values<code></code>,
 	 * <code>application/sparql-results+json</code>,<code>application/json</code>,
 	 * <code>application/sparql-results+xml</code>,<code>application/xml</code>
-	 * 
+	 *
 	 * @param mimeType
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 * @throws IllegalMimeTypeException
 	 *             when mime-type is not accepted in the context of SPARQL SELECT queries
 	 */
-	public static ResultSetFormatter getFormatter(final String mimeType) throws IllegalMimeTypeException {
+	public ResultSetFormatter getFormatter(final String mimeType) throws IllegalMimeTypeException {
 		final ResultSetFormatter resultSetFormatter = formatters.get(mimeType);
 
 		if (resultSetFormatter != null)

@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider;
-import org.opendatahacklab.semanticoctopus.service.AggregatorBasedQueryExecutorServiceFactory;
+import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorServiceFactory;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutor;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorService;
 
@@ -63,7 +63,7 @@ public class QueryExecutorTest {
 		// TODO
 
 		final ResourceConfig config = new ResourceConfig();
-		config.registerInstances(new AggregatorBasedQueryExecutorServiceFactory(aggregator, formatterProvider));
+		config.registerInstances(new FormatterBasedQueryExecutorServiceFactory(aggregator, formatterProvider));
 		final HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 
 		return server;

@@ -22,7 +22,7 @@ import com.hp.hpl.jena.query.ResultSet;
  * 
  * @author OOL
  */
-public class FormatterBasedQueryExecutionServiceTest {
+public class FormatterBasedQueryExecutorServiceTest {
 
 	// Testbed
 	private static final ResultSet RESULT_SET = mock(ResultSet.class);

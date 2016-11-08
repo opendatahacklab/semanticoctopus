@@ -47,12 +47,19 @@ public class ResultSetFormatterProviderTest {
 	private static final String TAB = "\t";
 
 	private static final String CSV_REPR = SUBJ_VAR + COMMA + PRED_VAR + COMMA + OBJ_VAR + A_CAPO +
-			SUBJECT + COMMA + PREDICATE + COMMA + OBJECT + A_CAPO;
+					SUBJECT + COMMA + PREDICATE + COMMA + OBJECT + A_CAPO;
 	private static final String TSV_REPR = QM + SUBJ_VAR + TAB + QM + PRED_VAR + TAB + QM + OBJ_VAR + LF +
-			"<" + SUBJECT + ">" + TAB + SHORT_PREDICATE + TAB + "<" + OBJECT + ">" + LF;
+					"<" + SUBJECT + ">" + TAB + SHORT_PREDICATE + TAB + "<" + OBJECT + ">" + LF;
 
 	private static final String TRIPLE = QM + SUBJ_VAR + SPACE + QM + PRED_VAR + SPACE + QM + OBJ_VAR;
 	private static final String QUERY = "SELECT " + TRIPLE + " WHERE {" + TRIPLE + "}";
+
+	/**
+	 * @return
+	 */
+	private ResultSetFormatterProvider createTestSubject() {
+		return new ResultSetFormatterProvider();
+	}
 
 	/**
 	 * @return
@@ -130,7 +137,8 @@ public class ResultSetFormatterProviderTest {
 	 */
 	@Test(expected = IllegalMimeTypeException.class)
 	public void shouldRaiseExceptionOnIllegalMimeType() throws IllegalMimeTypeException {
-		ResultSetFormatterProvider.getFormatter(TEXT_MT);
+		final ResultSetFormatterProvider testSubject = createTestSubject();
+		testSubject.getFormatter(TEXT_MT);
 	}
 
 	/**
@@ -142,11 +150,12 @@ public class ResultSetFormatterProviderTest {
 	 * @throws IllegalMimeTypeException
 	 */
 	private void checkFormatter(final String mimeType, final ResultSet resultSet, final String expectedFormattedResult)
-			throws IllegalMimeTypeException {
-		final ResultSetFormatter testSubject = ResultSetFormatterProvider.getFormatter(mimeType);
-		assertEquals("Wrong mime type", mimeType, testSubject.getMimeType());
+					throws IllegalMimeTypeException {
+		final ResultSetFormatterProvider testSubject = createTestSubject();
+		final ResultSetFormatter formatter = testSubject.getFormatter(mimeType);
+		assertEquals("Wrong mime type", mimeType, formatter.getMimeType());
 
-		final String formattedResult = testSubject.format(resultSet);
+		final String formattedResult = formatter.format(resultSet);
 		assertEquals("Wrong result", expectedFormattedResult, formattedResult);
 	}
 }
