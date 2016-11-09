@@ -43,9 +43,9 @@ public class QueryExecutor {
 	@GET
 	// @Path("execQuery")
 	public Response executeQueryViaGET(@HeaderParam("Accept") final String acceptedFormat,
-			@QueryParam("query") final String query,
-			@QueryParam("default-graph-uri") final String defaultGraphUri,
-			@QueryParam("named-graph-uri") final String namedGraphUri) {
+					@QueryParam("query") final String query,
+					@QueryParam("default-graph-uri") final String defaultGraphUri,
+					@QueryParam("named-graph-uri") final String namedGraphUri) {
 		throw new RuntimeException("Unimplemented yet!");
 
 		// final Response response = Response.ok("GET: " + query).build();
@@ -63,7 +63,7 @@ public class QueryExecutor {
 	@Consumes("application/x-www-form-urlencoded")
 	// @Path("execQuery")
 	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-			final String query) {
+					final String query) {
 		throw new RuntimeException("Unimplemented yet!");
 	}
 
@@ -79,9 +79,9 @@ public class QueryExecutor {
 	@Consumes("application/sparql-query")
 	// @Path("execQuery")
 	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-			final String query,
-			@QueryParam("default-graph-uri") final String defaultGraphUri,
-			@QueryParam("named-graph-uri") final String namedGraphUri) {
+					final String query,
+					@QueryParam("default-graph-uri") final String defaultGraphUri,
+					@QueryParam("named-graph-uri") final String namedGraphUri) {
 		throw new RuntimeException("Unimplemented yet!");
 	}
 }

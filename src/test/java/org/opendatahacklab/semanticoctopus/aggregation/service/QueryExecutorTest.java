@@ -11,9 +11,12 @@ import java.net.URLEncoder;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
@@ -44,6 +47,14 @@ public class QueryExecutorTest {
 	private static final String QUERY = "SELECT ?s ?p ?o WHERE { ?s ?p ?o . } LIMIT 1";
 	private static final String MIME_TYPE = "text/plain";
 	private static final Response RESPONSE = mock(Response.class);
+	private static final String URL_ENCODED_MIME_TYPE = "application/x-www-form-urlencoded";
+	private static final String SPARQL_MIME_TYPE = "application/sparql-query";
+
+	private enum Method {
+		GET,
+		URL_ENCODED_POST,
+		SPARQL_POST
+	}
 
 	private QueryExecutor createTestSubject(final QueryExecutorServiceFactory serviceFactory) {
 		return new QueryExecutor(serviceFactory);
@@ -77,7 +88,7 @@ public class QueryExecutorTest {
 	 * @throws IllegalMimeTypeException
 	 */
 	private QueryExecutorServiceFactory createServiceFactory(final QueryExecutorService service, final String mimeType)
-			throws IllegalMimeTypeException {
+					throws IllegalMimeTypeException {
 		final QueryExecutorServiceFactory serviceFactory = mock(QueryExecutorServiceFactory.class);
 		when(serviceFactory.createService((String) null)).thenThrow(new IllegalMimeTypeException(mimeType));
 		when(serviceFactory.createService(mimeType)).thenReturn(service);
@@ -85,10 +96,53 @@ public class QueryExecutorTest {
 		return serviceFactory;
 	}
 
+	/**
+	 * @return
+	 */
 	private QueryExecutorService createService() {
 		final QueryExecutorService service = mock(QueryExecutorService.class);
 		when(service.execQuery(QUERY)).thenReturn(RESPONSE);
 		return service;
+	}
+
+	/**
+	 * @param method
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 */
+	private void testMethod(final Method method) throws IllegalMimeTypeException, UnsupportedEncodingException {
+		final QueryExecutorService service = createService();
+		final QueryExecutorServiceFactory serviceFactory = createServiceFactory(service, MIME_TYPE);
+		final QueryExecutor testSubject = createTestSubject(serviceFactory);
+
+		final HttpServer server = prepareServer(testSubject);
+
+		final Invocation client = generateInvocationByMethod(method);
+		final Response response = client.invoke(Response.class);
+
+		disposeServer(server);
+
+		assertSame("Wrong response", RESPONSE, response);
+		verify(serviceFactory.createService(MIME_TYPE));
+		verify(service.execQuery(QUERY));
+	}
+
+	/**
+	 * @param method
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private Invocation generateInvocationByMethod(final Method method) throws UnsupportedEncodingException {
+		switch (method) {
+			case GET:
+				return prepareGETInvocationBuilder(MIME_TYPE, QUERY);
+			case URL_ENCODED_POST:
+				return prepareUrlEncodedPOSTInvocationBuilder(MIME_TYPE, QUERY);
+			case SPARQL_POST:
+				// TODO
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -98,17 +152,43 @@ public class QueryExecutorTest {
 	 * @throws UriBuilderException
 	 * @throws IllegalArgumentException
 	 */
-	private Builder prepareInvocationBuilder(final String mimeType, final String query)
-			throws IllegalArgumentException, UriBuilderException, UnsupportedEncodingException {
+	private Invocation prepareGETInvocationBuilder(final String mimeType, final String query)
+					throws IllegalArgumentException, UriBuilderException, UnsupportedEncodingException {
 		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
 		final URI targetUri = baseBuilder.path(QueryExecutor.ENDPOINT_NAME)
-				.queryParam(QUERY_PARAM, URLEncoder.encode(query, "UTF-8").replace("+", "%20")).build();
+						.queryParam(QUERY_PARAM, URLEncoder.encode(query, "UTF-8").replace("+", "%20")).build();
+
+		final Client client = ClientBuilder.newClient();
+		final WebTarget resourceTarget = client.target(targetUri);
+		final Builder invocationBuilder = resourceTarget.request(mimeType);
+		final Invocation invocation = invocationBuilder.buildGet();
+
+		return invocation;
+	}
+
+	/**
+	 * @param baseUri
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws UriBuilderException
+	 * @throws IllegalArgumentException
+	 */
+	private Invocation prepareUrlEncodedPOSTInvocationBuilder(final String mimeType, final String query)
+					throws IllegalArgumentException, UriBuilderException, UnsupportedEncodingException {
+		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
+		final URI targetUri = baseBuilder.path(QueryExecutor.ENDPOINT_NAME).build();
 
 		final Client client = ClientBuilder.newClient();
 		final WebTarget resourceTarget = client.target(targetUri);
 		final Builder invocationBuilder = resourceTarget.request(mimeType);
 
-		return invocationBuilder;
+		final MultivaluedHashMap<String, String> form = new MultivaluedHashMap<>();
+		form.putSingle("query", URLEncoder.encode(query, "UTF-8").replace("+", "%20"));
+		final Entity<Form> entity = Entity.form(form);
+		final Invocation invocation = invocationBuilder
+						.buildPost(entity);
+
+		return invocation;
 	}
 
 	/**
@@ -126,20 +206,20 @@ public class QueryExecutorTest {
 	 */
 	@Test
 	public void testQueryExecutionGET() throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
-			UnsupportedEncodingException {
-		final QueryExecutorService service = createService();
-		final QueryExecutorServiceFactory serviceFactory = createServiceFactory(service, MIME_TYPE);
-		final QueryExecutor testSubject = createTestSubject(serviceFactory);
+	UnsupportedEncodingException {
+		testMethod(Method.GET);
+	}
 
-		final HttpServer server = prepareServer(testSubject);
-
-		final Invocation client = prepareInvocationBuilder(MIME_TYPE, QUERY).buildGet();
-		final Response response = client.invoke(Response.class);
-
-		disposeServer(server);
-
-		verify(serviceFactory.createService(MIME_TYPE));
-		verify(service.execQuery(QUERY));
-		assertSame("Wrong response", RESPONSE, response);
+	/**
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 * @throws UriBuilderException
+	 * @throws IllegalArgumentException
+	 */
+	@Test
+	public void testQueryExecutionURLPOST()
+					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
+					UnsupportedEncodingException {
+		testMethod(Method.URL_ENCODED_POST);
 	}
 }
