@@ -15,8 +15,6 @@ import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorSe
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorService;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorServiceFactory;
 
-import com.hp.hpl.jena.query.ResultSet;
-
 /**
  * Test class for {@link FormatterBasedQueryExecutorServiceFactory}
  *
@@ -25,9 +23,7 @@ import com.hp.hpl.jena.query.ResultSet;
 public class FormatterBasedQueryExecutorServiceFactoryTest {
 
 	// Testbed
-	private static final ResultSet RESULT_SET = mock(ResultSet.class);
 	private static final String MIME_TYPE = "text/plain";
-	private static final String FORMATTED_RESULT = "?s ?p ?o";
 
 	/**
 	 * @param aggregationEngine
@@ -105,7 +101,7 @@ public class FormatterBasedQueryExecutorServiceFactoryTest {
 		final QueryExecutorServiceFactory testSubject = createTestSubject(aggregator, formatterProvider);
 
 		try {
-			final QueryExecutorService service = testSubject.createService(MIME_TYPE);
+			testSubject.createService(MIME_TYPE);
 			fail("An exception should have been raised");
 		} catch (final IllegalMimeTypeException e) {
 			// All ok: expected!
