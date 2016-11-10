@@ -27,7 +27,7 @@ public class SemanticOctopus {
 		for (final String ontologyUrl : args)
 			ontologies.add(new URL(ontologyUrl));
 
-		final AggregationEngine e = new URLBasedAggregationEngine(ontologies);
+		final AggregationEngine e = new SimpleAggregationEngine(ontologies);
 
 		// TODO Start server
 

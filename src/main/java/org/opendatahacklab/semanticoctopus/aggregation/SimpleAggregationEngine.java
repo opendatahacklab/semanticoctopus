@@ -23,12 +23,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * @author Cristiano Longo
  *
  */
-public class URLBasedAggregationEngine implements AggregationEngine {
+public class SimpleAggregationEngine implements AggregationEngine {
 
 	private final List<URL> ontologyURLs;
 	private final OntModel model;
 
-	public URLBasedAggregationEngine() {
+	public SimpleAggregationEngine() {
 		final List<URL> ont = new ArrayList<URL>();
 		try {
 			final URL ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
@@ -48,7 +48,7 @@ public class URLBasedAggregationEngine implements AggregationEngine {
 	/**
 	 * 
 	 */
-	public URLBasedAggregationEngine(final List<URL> ontologyURLs) {
+	public SimpleAggregationEngine(final List<URL> ontologyURLs) {
 		this.ontologyURLs = Collections.unmodifiableList(ontologyURLs);
 		this.model = download(ontologyURLs);
 	}

@@ -2,7 +2,6 @@ package org.opendatahacklab.semanticoctopus.formatters;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.hp.hpl.jena.query.QueryExecution;
@@ -47,46 +46,45 @@ public class ResultSetFormatterProviderTest {
 	private static final String TAB = "\t";
 
 	private static final String CSV_REPR = SUBJ_VAR + COMMA + PRED_VAR + COMMA + OBJ_VAR + A_CAPO +
-					SUBJECT + COMMA + PREDICATE + COMMA + OBJECT + A_CAPO;
+			SUBJECT + COMMA + PREDICATE + COMMA + OBJECT + A_CAPO;
 	private static final String TSV_REPR = QM + SUBJ_VAR + TAB + QM + PRED_VAR + TAB + QM + OBJ_VAR + LF +
-					"<" + SUBJECT + ">" + TAB + SHORT_PREDICATE + TAB + "<" + OBJECT + ">" + LF;
+			"<" + SUBJECT + ">" + TAB + SHORT_PREDICATE + TAB + "<" + OBJECT + ">" + LF;
 	private static final String XML_REPR = "<?xml version=\"1.0\"?>\n"
-					+"<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n"
-					+"  <head>\n"
-					+"    <variable name=\"s\"/>\n"
-					+"    <variable name=\"p\"/>\n"
-					+"    <variable name=\"o\"/>\n"
-					+"  </head>\n"
-					+"  <results>\n"
-					+"    <result>\n"
-					+"      <binding name=\"s\">\n"
-					+"        <uri>http://eu.ool.ex/resources#ool</uri>\n"
-					+"      </binding>\n"
-					+"      <binding name=\"p\">\n"
-					+"        <uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</uri>\n"
-					+"      </binding>\n"
-					+ "      <binding name=\"o\">\n"
-					+"        <uri>http://eu.ool.ex/resources#Person</uri>\n"
-					+"      </binding>\n"
-					+"    </result>\n"
-					+"  </results>\n"
-					+"</sparql>\n";
+			+ "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n"
+			+ "  <head>\n"
+			+ "    <variable name=\"s\"/>\n"
+			+ "    <variable name=\"p\"/>\n"
+			+ "    <variable name=\"o\"/>\n"
+			+ "  </head>\n"
+			+ "  <results>\n"
+			+ "    <result>\n"
+			+ "      <binding name=\"s\">\n"
+			+ "        <uri>http://eu.ool.ex/resources#ool</uri>\n"
+			+ "      </binding>\n"
+			+ "      <binding name=\"p\">\n"
+			+ "        <uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</uri>\n"
+			+ "      </binding>\n"
+			+ "      <binding name=\"o\">\n"
+			+ "        <uri>http://eu.ool.ex/resources#Person</uri>\n"
+			+ "      </binding>\n"
+			+ "    </result>\n"
+			+ "  </results>\n"
+			+ "</sparql>\n";
 
 	private static final String JSON_REPR = "{\n"
-					+ " \"head\": {\n"
-					+ "  \"vars\": [ \"s\" , \"p\" , \"o\" ]\n"
-					+ "} ,\n"
-					+ "\"results\": {\n"
-					+ " \"bindings\": [\n"
-					+ "    {\n"
-					+ "      \"s\": { \"type\": \"uri\" , \"value\": \"http://eu.ool.ex/resources#ool\" } ,\n"
-					+ "      \"p\": { \"type\": \"uri\" , \"value\": \"http://www.w3.org/1999/02/22-rdf-syntax-ns#type\" } ,\n"
-					+ "      \"o\": { \"type\": \"uri\" , \"value\": \"http://eu.ool.ex/resources#Person\" }\n"
-					+ "    }\n"
-					+ "  ]\n"
-					+ "}\n"
-					+ "}\n";
-
+			+ "  \"head\": {\n"
+			+ "    \"vars\": [ \"s\" , \"p\" , \"o\" ]\n"
+			+ "  } ,\n"
+			+ "  \"results\": {\n"
+			+ "    \"bindings\": [\n"
+			+ "      {\n"
+			+ "        \"s\": { \"type\": \"uri\" , \"value\": \"http://eu.ool.ex/resources#ool\" } ,\n"
+			+ "        \"p\": { \"type\": \"uri\" , \"value\": \"http://www.w3.org/1999/02/22-rdf-syntax-ns#type\" } ,\n"
+			+ "        \"o\": { \"type\": \"uri\" , \"value\": \"http://eu.ool.ex/resources#Person\" }\n"
+			+ "      }\n"
+			+ "    ]\n"
+			+ "  }\n"
+			+ "}\n";
 
 	private static final String TRIPLE = QM + SUBJ_VAR + SPACE + QM + PRED_VAR + SPACE + QM + OBJ_VAR;
 	private static final String QUERY = "SELECT " + TRIPLE + " WHERE {" + TRIPLE + "}";
@@ -134,7 +132,7 @@ public class ResultSetFormatterProviderTest {
 	 *
 	 */
 	@Test
-	@Ignore
+	// @Ignore
 	public void shouldBuildSPARQLJSONFormatter() throws IllegalMimeTypeException {
 		checkFormatter(SPARQL_JSON_MT, createResultSet(), JSON_REPR);
 	}
@@ -144,7 +142,6 @@ public class ResultSetFormatterProviderTest {
 	 *
 	 */
 	@Test
-	@Ignore
 	public void shouldBuildJSONFormatter() throws IllegalMimeTypeException {
 		checkFormatter(JSON_MT, createResultSet(), JSON_REPR);
 	}
@@ -185,7 +182,7 @@ public class ResultSetFormatterProviderTest {
 	 * @throws IllegalMimeTypeException
 	 */
 	private void checkFormatter(final String mimeType, final ResultSet resultSet, final String expectedFormattedResult)
-					throws IllegalMimeTypeException {
+			throws IllegalMimeTypeException {
 		final ResultSetFormatterProvider testSubject = createTestSubject();
 		final ResultSetFormatter formatter = testSubject.getFormatter(mimeType);
 		assertEquals("Wrong mime type", mimeType, formatter.getMimeType());

@@ -20,12 +20,12 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * Test cases for the {@link URLBasedAggregationEngine}
+ * Test cases for the {@link SimpleAggregationEngine}
  * 
  * @author Cristiano Longo
  *
  */
-public class URLBasedAggregationEngineTest {
+public class SimpleAggregationEngineTest {
 
 	private static final String TESTBED_PREFIX = "PREFIX testbed:<http://opendatahacklab.org/semanticoctopus/testbed/>\n";
 	private static final String RELATIVES_QUERY = TESTBED_PREFIX
@@ -63,7 +63,7 @@ public class URLBasedAggregationEngineTest {
 	 * @throws MalformedURLException
 	 * 
 	 */
-	public URLBasedAggregationEngineTest() throws MalformedURLException {
+	public SimpleAggregationEngineTest() throws MalformedURLException {
 		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");
 		ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
@@ -85,7 +85,7 @@ public class URLBasedAggregationEngineTest {
 	 *            pairs expected to be returned as result of the relative query
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
-		final AggregationEngine engine = new URLBasedAggregationEngine(ontologies);
+		final AggregationEngine engine = new SimpleAggregationEngine(ontologies);
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
@@ -229,7 +229,7 @@ public class URLBasedAggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferMemberOfSuperclasses() {
-		final AggregationEngine engine = new URLBasedAggregationEngine(Collections.singletonList(ontologySubclass));
+		final AggregationEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -243,7 +243,7 @@ public class URLBasedAggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() {
-		final AggregationEngine engine = new URLBasedAggregationEngine(Collections.singletonList(ontologySubproperty));
+		final AggregationEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
 				+ "SELECT ?x ?y { ?x testbed:q ?y }");
