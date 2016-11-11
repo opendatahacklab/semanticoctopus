@@ -149,7 +149,7 @@ public class QueryExecutorTest {
 	 *
 	 * @throws IllegalMimeTypeException
 	 */
-	private HttpServer prepareServer(final QueryExecutor executor) throws IllegalMimeTypeException {
+	private HttpServer prepareServer(final QueryExecutor executor) {
 		final UriBuilder baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
 		final URI baseUri = baseBuilder.build();
 

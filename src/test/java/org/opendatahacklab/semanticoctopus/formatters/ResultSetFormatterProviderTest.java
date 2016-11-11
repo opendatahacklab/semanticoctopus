@@ -47,8 +47,10 @@ public class ResultSetFormatterProviderTest {
 
 	private static final String CSV_REPR = SUBJ_VAR + COMMA + PRED_VAR + COMMA + OBJ_VAR + A_CAPO +
 			SUBJECT + COMMA + PREDICATE + COMMA + OBJECT + A_CAPO;
+
 	private static final String TSV_REPR = QM + SUBJ_VAR + TAB + QM + PRED_VAR + TAB + QM + OBJ_VAR + LF +
 			"<" + SUBJECT + ">" + TAB + SHORT_PREDICATE + TAB + "<" + OBJECT + ">" + LF;
+
 	private static final String XML_REPR = "<?xml version=\"1.0\"?>\n"
 			+ "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n"
 			+ "  <head>\n"
@@ -132,7 +134,6 @@ public class ResultSetFormatterProviderTest {
 	 *
 	 */
 	@Test
-	// @Ignore
 	public void shouldBuildSPARQLJSONFormatter() throws IllegalMimeTypeException {
 		checkFormatter(SPARQL_JSON_MT, createResultSet(), JSON_REPR);
 	}
