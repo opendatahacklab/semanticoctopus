@@ -42,7 +42,7 @@ public class VersionTest {
 		baseBuilder = UriBuilder.fromUri(HOST).port(PORT);
 		final URI baseUri = baseBuilder.build();
 
-		final ResourceConfig config = new ResourceConfig(); // Version.class);
+		final ResourceConfig config = new ResourceConfig();
 		config.registerInstances(new Version());
 		server = JdkHttpServerFactory.createHttpServer(baseUri, config);
 	}

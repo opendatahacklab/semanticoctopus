@@ -34,19 +34,6 @@ public class QueryExecutor {
 	 */
 	public static final int INVALID_FORMAT_STATUS_CODE = Response.Status.NOT_ACCEPTABLE.getStatusCode();
 
-
-	// private static final String ACCEPTED_FORMATS_MESSAGE = "Accepted formats are:\n"
-	// + "\t- text/csv\n"
-	// + "\t- text/tab-separated-values\n"
-	// + "\t- application/sparql-results+json\n"
-	// + "\t- application/json\n"
-	// + "\t- application/sparql-results+xml\n"
-	// + "\t- application/xml\n"
-	// + "Provided format is:\n";
-	// private static final List<Variant> ACCEPTED_VARIANTS = Arrays.asList(
-	// Variant.mediaTypes(MediaType.valueOf(URL_ENCODED_MEDIA_TYPE)).build().get(0),
-	// Variant.mediaTypes(MediaType.valueOf(SPARQL_QUERY_MEDIA_TYPE)).build().get(0));
-
 	public static final String ENDPOINT_NAME = "sparql";
 
 	// Factory building services for real query execution
@@ -85,7 +72,6 @@ public class QueryExecutor {
 	 */
 	@POST
 	@Consumes(URL_ENCODED_MEDIA_TYPE)
-	// @Path("execQuery")
 	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
 					final String query) {
 		return executeQuery(acceptedFormat, query);
@@ -101,7 +87,6 @@ public class QueryExecutor {
 	 */
 	@POST
 	@Consumes(SPARQL_QUERY_MEDIA_TYPE)
-	// @Path("execQuery")
 	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
 					final String query,
 					@QueryParam("default-graph-uri") final String defaultGraphUri,
@@ -135,10 +120,6 @@ public class QueryExecutor {
 	 * @return
 	 */
 	private Response createNotAcceptableResponse(final String mimeType) {
-		// final Response response = Response.notAcceptable(ACCEPTED_VARIANTS)
-		// .entity(Entity.text("Provided format is '" + mimeType + "'"))
-		// .build();
-
 		final Response response = Response.status(INVALID_FORMAT_STATUS_CODE)
 						// .entity(Entity.text(ACCEPTED_FORMATS_MESSAGE + mimeType))
 						.build();
