@@ -9,6 +9,7 @@ import java.util.List;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.jersey.jetty.servlet.JettyWebContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.SimpleAggregationEngine;
@@ -46,8 +47,6 @@ public class SemanticOctopus {
 			final AggregationEngine engine = generateEngine(args);
 			final QueryExecutor executor = generateQueryExecutor(engine);
 			generateAndStartServer(args[0], Integer.parseInt(args[1]), executor);
-
-			engine.write(System.out, "http://opendatahacklab.org/");
 		} catch (final NumberFormatException e) {
 			System.err.println("Port must be a numeric value");
 			System.exit(2);

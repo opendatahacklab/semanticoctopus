@@ -1,0 +1,18 @@
+<html>
+<body>
+<form method="GET" action="http://localhost:9000/">
+	<div>
+		<textarea name="query" cols="80" rows="10">
+PREFIX mov: &lt;http://bigasterisk.com/movieTimes#&gt; 
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; 
+
+SELECT ?mov ?label WHERE { 
+  ?mov a mov:Movie; 
+       rdfs:label ?label .
+}
+	</textarea>
+	<input type="submit" />
+	</div>
+</form>
+</body>
+</html>

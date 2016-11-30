@@ -105,11 +105,17 @@
 			<version>${glassfish-version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.sun.net.httpserver</groupId>
-			<artifactId>http</artifactId>
-			<version>20070405</version>
-		</dependency>
+<dependency>
+    <groupId>org.glassfish.jersey.containers</groupId>
+    <artifactId>jersey-container-jetty-servlet</artifactId>
+    <version>2.24</version>
+</dependency>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.sun.net.httpserver</groupId> -->
+<!-- 			<artifactId>http</artifactId> -->
+<!-- 			<version>20070405</version> -->
+<!-- 		</dependency> -->
 
 
 
