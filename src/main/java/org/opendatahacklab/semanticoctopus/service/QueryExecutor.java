@@ -110,6 +110,8 @@ public class QueryExecutor {
 
 			return response;
 		} catch (final IllegalMimeTypeException e) {
+			e.printStackTrace();
+
 			return createNotAcceptableResponse(acceptedFormat);
 		}
 	}
