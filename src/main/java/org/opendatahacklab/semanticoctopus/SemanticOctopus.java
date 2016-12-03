@@ -8,7 +8,9 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.SimpleAggregationEngine;
@@ -106,13 +108,16 @@ public class SemanticOctopus {
 	 * @throws IllegalMimeTypeException
 	 */
 	private static HttpServer generateAndStartServer(final String host, final int port, final QueryExecutor executor) {
+		System.setProperty("logs.folder", ".");
 		final UriBuilder baseBuilder = UriBuilder.fromUri(host).port(port).path("/");
 		final URI baseUri = baseBuilder.build();
 
 		final ResourceConfig config = new ResourceConfig();
+		config.register(LoggingFeature.class);
 		config.registerInstances(executor);
 		final HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
-
+		System.out.println("Server started at "+baseUri);
+		
 		return server;
 	}
 }

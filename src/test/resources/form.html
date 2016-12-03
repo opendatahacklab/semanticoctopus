@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/" 
+      >
+  <head>
+    <title>SPARQL query form</title>
+    <style type="text/css" media="all">
+      .message {
+	  border: 1px solid black;
+	  background: #fea;
+	  margin: 1em;
+	  padding: .5em;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      An experimental SPARQL endpoint for <a href="http://whatsplayingnext.com">whatsplayingnext.com</a> is 
+      at <a href="http://whatsplayingnext.com/sparql">http://whatsplayingnext.com/sparql</a>. /sparql takes a ?query= argument. You can prepare your query 
+      with this form.
+    </p>
+
+    <form method="GET" action="http://localhost:9003/sparql">
+      <div>
+	<textarea name="query" cols="80" rows="10">
+PREFIX mov: &lt;http://bigasterisk.com/movieTimes#&gt; 
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; 
+
+SELECT ?mov ?label WHERE { 
+  ?mov a mov:Movie; 
+       rdfs:label ?label .
+}
+	</textarea>
+	<div>
+	  <input type="submit"/>
+	</div>
+      </div>
+    </form>
+
+    <p>The dataset is currently only today's movie showtimes for my
+      local area, which is about 1000 tiples. Your logged-in user's
+      data is merged into the graph.
+    </p>
+
+    <p>
+      /sparql returns
+      <code>application/sparql-results+xml</code> or
+      <code>application/sparql-results+json</code> or
+      <code>text/html</code> depending 
+      on your <code>Accept:</code> header. To test the xml results, you could escape a 
+      query by submitting this form and then putting it into a command-line 
+      like this:
+    </p>
+    <pre>
+      curl -H "Accept: application/sparql-results+xml" "..."
+    </pre>
+
+
+<hr/>
+    <p>
+      Maintained by 
+<a href="mailto:drewp@bigasterisk.com">drewp@bigasterisk.com</a>. <a href="todo">See the todo list.</a>
+    </p>
+  </body>
+</html>

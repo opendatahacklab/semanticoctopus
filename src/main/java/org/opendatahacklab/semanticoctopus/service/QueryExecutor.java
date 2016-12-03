@@ -101,12 +101,17 @@ public class QueryExecutor {
 	 * @return
 	 */
 	private Response executeQuery(final String acceptedFormat, final String query) {
+		System.out.println("Requested execution of query: \n" + query);
+		System.out.println("\nRequested format: " + acceptedFormat);
+
 		try {
 			final QueryExecutorService service = queryExecutorServiceFactory.createService(acceptedFormat);
 			final Response response = service.execQuery(query);
 
 			return response;
 		} catch (final IllegalMimeTypeException e) {
+			e.printStackTrace();
+
 			return createNotAcceptableResponse(acceptedFormat);
 		}
 	}
