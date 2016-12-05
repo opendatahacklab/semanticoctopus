@@ -12,6 +12,13 @@ import com.hp.hpl.jena.query.ResultSet;
  */
 enum MimeTypeBasedFormatter implements ResultSetFormatter {
 
+	ALL("*/*"){
+		@Override
+		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+			com.hp.hpl.jena.query.ResultSetFormatter.outputAsCSV(outputStream, resultSet);
+		}		
+	},
+	
 	CSV("text/csv") {
 
 		@Override

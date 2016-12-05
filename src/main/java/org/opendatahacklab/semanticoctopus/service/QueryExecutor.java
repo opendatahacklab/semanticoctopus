@@ -61,9 +61,26 @@ public class QueryExecutor {
 					@QueryParam("query") final String query,
 					@QueryParam("default-graph-uri") final String defaultGraphUri,
 					@QueryParam("named-graph-uri") final String namedGraphUri) {
+		logRequest("GET", acceptedFormat, query, defaultGraphUri, namedGraphUri);
 		return executeQuery(acceptedFormat, query);
 	}
 
+	/**
+	 * Helper method to log a query request
+	 * 
+	 * @param method
+	 * @param acceptedFormat
+	 * @param query
+	 * @param defaultGraph
+	 * @param namedGraph
+	 */
+	private void logRequest(final String method, final String acceptedFormat, final String query, final String defaultGraph, final String namedGraph){
+		System.out.println("Requested execution of query: \n" + query);
+		System.out.println("Method: "+method);
+		System.out.println("Accepted format: " + acceptedFormat);
+		System.out.println("Default graph: "+defaultGraph);
+		System.out.println("Named Graph: "+namedGraph);
+	}
 	/**
 	 * @param request
 	 * @param query
@@ -74,6 +91,7 @@ public class QueryExecutor {
 	@Consumes(URL_ENCODED_MEDIA_TYPE)
 	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
 					final String query) {
+		logRequest("POST URLENCODED", acceptedFormat, query, "NA", "NA");
 		return executeQuery(acceptedFormat, query);
 	}
 
@@ -101,8 +119,6 @@ public class QueryExecutor {
 	 * @return
 	 */
 	private Response executeQuery(final String acceptedFormat, final String query) {
-		System.out.println("Requested execution of query: \n" + query);
-		System.out.println("\nRequested format: " + acceptedFormat);
 
 		try {
 			final QueryExecutorService service = queryExecutorServiceFactory.createService(acceptedFormat);
