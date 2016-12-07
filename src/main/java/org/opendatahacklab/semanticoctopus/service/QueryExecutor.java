@@ -1,5 +1,10 @@
 package org.opendatahacklab.semanticoctopus.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Map;
+import java.util.TreeMap;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -9,11 +14,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
+import org.opendatahacklab.semanticoctopus.formatters.IllegalRequestBodyException;
 
 /**
  * Query executor API.<br>
- * It uses an instance of {@link QueryExecutorServiceFactory} to generate a response, containing the result of SELECT
- * query or an error message, according to the latter and requested output format.
+ * It uses an instance of {@link QueryExecutorServiceFactory} to generate a
+ * response, containing the result of SELECT query or an error message,
+ * according to the latter and requested output format.
  *
  * @author OOL
  */
@@ -58,9 +65,8 @@ public class QueryExecutor {
 	 */
 	@GET
 	public Response executeQueryViaGET(@HeaderParam("Accept") final String acceptedFormat,
-					@QueryParam("query") final String query,
-					@QueryParam("default-graph-uri") final String defaultGraphUri,
-					@QueryParam("named-graph-uri") final String namedGraphUri) {
+			@QueryParam("query") final String query, @QueryParam("default-graph-uri") final String defaultGraphUri,
+			@QueryParam("named-graph-uri") final String namedGraphUri) {
 		logRequest("GET", acceptedFormat, query, defaultGraphUri, namedGraphUri);
 		return executeQuery(acceptedFormat, query);
 	}
@@ -74,25 +80,55 @@ public class QueryExecutor {
 	 * @param defaultGraph
 	 * @param namedGraph
 	 */
-	private void logRequest(final String method, final String acceptedFormat, final String query, final String defaultGraph, final String namedGraph){
+	private void logRequest(final String method, final String acceptedFormat, final String query,
+			final String defaultGraph, final String namedGraph) {
 		System.out.println("Requested execution of query: \n" + query);
-		System.out.println("Method: "+method);
+		System.out.println("Method: " + method);
 		System.out.println("Accepted format: " + acceptedFormat);
-		System.out.println("Default graph: "+defaultGraph);
-		System.out.println("Named Graph: "+namedGraph);
+		System.out.println("Default graph: " + defaultGraph);
+		System.out.println("Named Graph: " + namedGraph);
 	}
+
 	/**
 	 * @param request
-	 * @param query
+	 * @param body
 	 *
 	 * @return
+	 * @throws IllegalRequestBodyException
+	 * @throws UnsupportedEncodingException
 	 */
 	@POST
 	@Consumes(URL_ENCODED_MEDIA_TYPE)
-	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-					final String query) {
-		logRequest("POST URLENCODED", acceptedFormat, query, "NA", "NA");
+	public Response executeUrlEncodedQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat, final String body)
+			throws UnsupportedEncodingException, IllegalRequestBodyException {
+		// URL-encoded, ampersand-separated query parameters.
+		logRequest("POST URLENCODED", acceptedFormat, body, "NA", "NA");
+		final Map<String, String> queryParameters = extractParameters(body);
+		final String query = queryParameters.get("query");
+		if (query == null)
+			throw new IllegalRequestBodyException("Missing mandatory query parameter in the request body");
+		System.out.println("Performing query "+query);
 		return executeQuery(acceptedFormat, query);
+	}
+
+	/**
+	 * Extract a map key -> value pairs from a URLEncoded query body
+	 * 
+	 * @param body
+	 * @return
+	 * @throws IllegalRequestBodyException
+	 * @throws UnsupportedEncodingException
+	 */
+	private Map<String, String> extractParameters(final String body)
+			throws IllegalRequestBodyException, UnsupportedEncodingException {
+		final Map<String, String> result = new TreeMap<String, String>();
+		for (final String piece : body.split("&")) {
+			final String[] pair = piece.split("=");
+			if (pair.length != 2)
+				throw new IllegalRequestBodyException("Error parsing in query body " + piece);
+			result.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
+		}
+		return result;
 	}
 
 	/**
@@ -105,10 +141,9 @@ public class QueryExecutor {
 	 */
 	@POST
 	@Consumes(SPARQL_QUERY_MEDIA_TYPE)
-	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat,
-					final String query,
-					@QueryParam("default-graph-uri") final String defaultGraphUri,
-					@QueryParam("named-graph-uri") final String namedGraphUri) {
+	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat, final String query,
+			@QueryParam("default-graph-uri") final String defaultGraphUri,
+			@QueryParam("named-graph-uri") final String namedGraphUri) {
 		return executeQuery(acceptedFormat, query);
 	}
 
@@ -142,8 +177,8 @@ public class QueryExecutor {
 	 */
 	private Response createNotAcceptableResponse(final String mimeType) {
 		final Response response = Response.status(INVALID_FORMAT_STATUS_CODE)
-						// .entity(Entity.text(ACCEPTED_FORMATS_MESSAGE + mimeType))
-						.build();
+				// .entity(Entity.text(ACCEPTED_FORMATS_MESSAGE + mimeType))
+				.build();
 
 		return response;
 	}
