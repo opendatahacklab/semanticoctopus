@@ -1,2 +1,2 @@
 #!/bin/sh
-curl -i --data-urlencode @query.sparql http://localhost:9003/sparql
+curl -i -H "Accept: application/sparql-results+json" --data-urlencode "query=SELECT * WHERE {?x ?y ?z} LIMIT 10" http://localhost:9003/sparql
