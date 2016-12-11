@@ -3,6 +3,9 @@ package org.opendatahacklab.semanticoctopus.service;
 import javax.ws.rs.core.Response;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
+
+import com.hp.hpl.jena.query.QueryParseException;
 
 /**
  * A service for SPARQL query execution by an {@link AggregationEngine}
@@ -27,6 +30,8 @@ public interface QueryExecutorService {
 	 * @param query
 	 *
 	 * @return An HTTP {@link Response} containing the result of query
+	 * @throws IllegalMimeTypeException 
+	 * @throws QueryParseException 
 	 */
-	Response execQuery(final String query);
+	Response execQuery(final String query) throws QueryParseException, IllegalMimeTypeException;
 }

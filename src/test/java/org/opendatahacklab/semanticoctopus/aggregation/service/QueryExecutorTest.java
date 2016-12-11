@@ -30,6 +30,7 @@ import org.opendatahacklab.semanticoctopus.service.QueryExecutor;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorService;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorServiceFactory;
 
+import com.hp.hpl.jena.query.QueryParseException;
 import com.sun.net.httpserver.HttpServer;
 
 /**
@@ -46,6 +47,7 @@ public class QueryExecutorTest {
 	private static final String HOST = "http://localhost/";
 	private static final int PORT = 9876;
 	private static final String QUERY = "SELECT ?s ?p ?o WHERE { ?s ?p ?o . } LIMIT 1";
+	private static final String INVALID_QUERY = "Invalid query";
 	private static final String MIME_TYPE = "text/plain";
 	private static final String RESPONSE = "A response!";
 
@@ -109,8 +111,10 @@ public class QueryExecutorTest {
 
 	/**
 	 * @return
+	 * @throws IllegalMimeTypeException 
+	 * @throws QueryParseException 
 	 */
-	private QueryExecutorService createService() {
+	private QueryExecutorService createService() throws QueryParseException, IllegalMimeTypeException {
 		final QueryExecutorService service = mock(QueryExecutorService.class);
 		when(service.execQuery(QUERY)).thenReturn(Response.ok(RESPONSE).build());
 
@@ -165,13 +169,22 @@ public class QueryExecutorTest {
 	 * @throws UnsupportedEncodingException
 	 */
 	private Invocation generateInvocationByMethod(final Method method) throws UnsupportedEncodingException {
+		return generateInvocationByMethod(method, QUERY);
+	}
+
+	/**
+	 * @param method
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	private Invocation generateInvocationByMethod(final Method method, final String query) throws UnsupportedEncodingException {
 		switch (method) {
 			case GET:
-				return prepareGETInvocationBuilder(MIME_TYPE, QUERY);
+				return prepareGETInvocationBuilder(MIME_TYPE, query);
 			case URL_ENCODED_POST:
-				return preparePOSTInvocationBuilder(MIME_TYPE, "application/x-www-form-urlencoded", "query="+QUERY);
+				return preparePOSTInvocationBuilder(MIME_TYPE, "application/x-www-form-urlencoded", "query="+query);
 			case DIRECT_POST:
-				return preparePOSTInvocationBuilder(MIME_TYPE, "application/sparql-query", QUERY);
+				return preparePOSTInvocationBuilder(MIME_TYPE, "application/sparql-query", query);
 			default:
 				return null;
 		}
@@ -212,11 +225,12 @@ public class QueryExecutorTest {
 
 	/**
 	 * @param method
+	 * @param expectedStatusCode TODO
 	 *
 	 * @throws IllegalMimeTypeException
 	 * @throws UnsupportedEncodingException
 	 */
-	private void testUnsuccessfulMethod(final Method method)
+	private void testUnsuccessfulMethod(final Method method, final int expectedStatusCode)
 					throws IllegalMimeTypeException, UnsupportedEncodingException {
 		// final QueryExecutorService service = createService();
 		final QueryExecutorServiceFactory serviceFactory = createServiceFactory(null, MIME_TYPE);
@@ -227,12 +241,38 @@ public class QueryExecutorTest {
 		final Invocation client = generateInvocationByMethod(method);
 		final Response response = client.invoke(Response.class);
 
-		assertEquals("Wrong response status", QueryExecutor.INVALID_FORMAT_STATUS_CODE,
+		assertEquals("Wrong response status", expectedStatusCode,
 						response.getStatusInfo().getStatusCode());
 
 		disposeServer(server);
 
 		verify(serviceFactory).createService(MIME_TYPE);
+	}
+
+	/**
+	 * Test sending a query string with a syntax errors.
+	 * 
+	 * @param method
+	 * @param expectedStatusCode 
+	 *
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 */
+	private void testInvalidQueryMethod(final Method method)
+					throws IllegalMimeTypeException, UnsupportedEncodingException {
+		final QueryExecutorService service = createService();
+		final QueryExecutorServiceFactory serviceFactory = createServiceFactory(service, MIME_TYPE);
+		final QueryExecutor testSubject = createTestSubject(serviceFactory);
+
+		final HttpServer server = prepareServer(testSubject);
+
+		final Invocation client = generateInvocationByMethod(method,  INVALID_QUERY);
+		final Response response = client.invoke(Response.class);
+
+		assertEquals("Wrong response status", QueryExecutor.SYNTAX_ERROR_STATUS_CODE,
+						response.getStatusInfo().getStatusCode());
+
+		disposeServer(server);
 	}
 
 	/**
@@ -281,10 +321,10 @@ public class QueryExecutorTest {
 	 * @throws IllegalArgumentException
 	 */
 	@Test
-	public void testQueryExecutionUnsuccessfulGET()
+	public void testQueryExecutionInvalidFormatOnGET()
 					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
 					UnsupportedEncodingException {
-		testUnsuccessfulMethod(Method.GET);
+		testUnsuccessfulMethod(Method.GET, QueryExecutor.INVALID_FORMAT_STATUS_CODE);
 	}
 
 	/**
@@ -294,10 +334,10 @@ public class QueryExecutorTest {
 	 * @throws IllegalArgumentException
 	 */
 	@Test
-	public void testQueryExecutionUnsuccessfulURLPOST()
+	public void testQueryExecutionInvalidFormatURLPOST()
 					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
 					UnsupportedEncodingException {
-		testUnsuccessfulMethod(Method.URL_ENCODED_POST);
+		testUnsuccessfulMethod(Method.URL_ENCODED_POST, QueryExecutor.INVALID_FORMAT_STATUS_CODE);
 	}
 
 	/**
@@ -307,9 +347,49 @@ public class QueryExecutorTest {
 	 * @throws IllegalArgumentException
 	 */
 	@Test
-	public void testQueryExecutionUnsuccessfulDirectPOST()
+	public void testQueryExecutionInvalidFormatDirectPOST()
 					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
 					UnsupportedEncodingException {
-		testUnsuccessfulMethod(Method.DIRECT_POST);
+		testUnsuccessfulMethod(Method.DIRECT_POST, QueryExecutor.INVALID_FORMAT_STATUS_CODE);
 	}
+	
+	/**
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 * @throws UriBuilderException
+	 * @throws IllegalArgumentException
+	 */
+	//@Test
+	public void testQueryExecutionQuerySyntaxErrorOnGET()
+					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
+					UnsupportedEncodingException {
+		testInvalidQueryMethod(Method.GET);
+	}
+
+	/**
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 * @throws UriBuilderException
+	 * @throws IllegalArgumentException
+	 */
+	//@Test
+	public void testQueryExecutionQuerySyntaxErrorURLPOST()
+					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
+					UnsupportedEncodingException {
+		testInvalidQueryMethod(Method.URL_ENCODED_POST);
+	}
+
+	/**
+	 * @throws IllegalMimeTypeException
+	 * @throws UnsupportedEncodingException
+	 * @throws UriBuilderException
+	 * @throws IllegalArgumentException
+	 */
+	//@Test
+	public void testQueryExecutionQuerySyntaxErrorDirectPOST()
+					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
+					UnsupportedEncodingException {
+		testInvalidQueryMethod(Method.DIRECT_POST);
+	}
+
 }

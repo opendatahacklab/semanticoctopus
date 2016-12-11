@@ -4,6 +4,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 
 import com.hp.hpl.jena.query.QueryParseException;
@@ -45,44 +46,11 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	 * execQuery(java.lang.String)
 	 */
 	@Override
-	public Response execQuery(final String query) {
+	public Response execQuery(final String query) throws QueryParseException, IllegalMimeTypeException {
 		final String mimeType = resultSetFormatter.getMimeType();
-		try {
-			final ResultSet resultSet = aggregationEngine.execQuery(query);
-			final String result = resultSetFormatter.format(resultSet);
-			return generateSuccessfulResponse(result, mimeType);
-		} catch (final QueryParseException e) {
-			return generateFailureResponse(e, mimeType);
-		}
-	}
-
-	/**
-	 * Generate a successful response according to specified result and
-	 * mime-type
-	 * 
-	 * @param result
-	 * @param mimeType
-	 * 
-	 * @return
-	 */
-	public Response generateSuccessfulResponse(final String result, final String mimeType) {
-		final Response response = addHeaders(Response.ok(result), mimeType).build();
-		return response;
-	}
-
-	/**
-	 * Generate a successful response according to specified result and
-	 * mime-type
-	 * 
-	 * @param e
-	 * @param mimeType
-	 * 
-	 * @return
-	 */
-	public Response generateFailureResponse(final Throwable e, final String mimeType) {
-		final Response response = addHeaders(Response.ok(e), mimeType).build();
-		e.printStackTrace();
-		return response;
+		final ResultSet resultSet = aggregationEngine.execQuery(query);
+		final String result = resultSetFormatter.format(resultSet);
+		return Response.ok(result).header(CONTENT_TYPE_HEADER_KEY, mimeType).build();
 	}
 
 	/**
@@ -91,7 +59,7 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	 * @param mimeType
 	 * @return
 	 */
-	private ResponseBuilder addHeaders(final ResponseBuilder r, final String mimeType){
+	private ResponseBuilder addHeaders(final ResponseBuilder r, final String mimeType) {
 		return r.header(CONTENT_TYPE_HEADER_KEY, mimeType).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*");
 	}
 }

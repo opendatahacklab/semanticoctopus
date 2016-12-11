@@ -16,6 +16,8 @@ import javax.ws.rs.core.Response;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalRequestBodyException;
 
+import com.hp.hpl.jena.query.QueryParseException;
+
 /**
  * Query executor API.<br>
  * It uses an instance of {@link QueryExecutorServiceFactory} to generate a
@@ -40,6 +42,11 @@ public class QueryExecutor {
 	 * HTTP status code representing an illegal response format requested
 	 */
 	public static final int INVALID_FORMAT_STATUS_CODE = Response.Status.NOT_ACCEPTABLE.getStatusCode();
+
+	/**
+	 * HTTP status code for the case of a query syntax error
+	 */
+	public static final int SYNTAX_ERROR_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
 
 	public static final String ENDPOINT_NAME = "sparql";
 
@@ -161,24 +168,20 @@ public class QueryExecutor {
 			return response;
 		} catch (final IllegalMimeTypeException e) {
 			e.printStackTrace();
-
-			return createNotAcceptableResponse(acceptedFormat);
+			return createErrorResponse(INVALID_FORMAT_STATUS_CODE); 
+		} catch (final QueryParseException e){
+			e.printStackTrace();
+			return createErrorResponse(SYNTAX_ERROR_STATUS_CODE);
 		}
 	}
-
+	
 	/**
-	 * Creates a {@link Response} for a not-acceptable-format condition
-	 *
-	 * @param acceptedFormat
-	 *            Requested and unaccepted format
-	 *
+	 * Create a response for a failure
+	 * 
+	 * @param statusCode
 	 * @return
 	 */
-	private Response createNotAcceptableResponse(final String mimeType) {
-		final Response response = Response.status(INVALID_FORMAT_STATUS_CODE)
-				// .entity(Entity.text(ACCEPTED_FORMATS_MESSAGE + mimeType))
-				.build();
-
-		return response;
+	private Response createErrorResponse(final int statusCode){
+		return Response.status(statusCode).header(QueryExecutorService.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*").build();		
 	}
 }

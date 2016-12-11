@@ -11,10 +11,12 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Test;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorService;
 import org.opendatahacklab.semanticoctopus.service.QueryExecutorService;
 
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
@@ -67,10 +69,12 @@ public class FormatterBasedQueryExecutorServiceTest {
 	}
 
 	/**
+	 * @throws IllegalMimeTypeException 
+	 * @throws QueryParseException 
 	 * 
 	 */
 	@Test
-	public void shouldReturnAResponseWithCorrectContentTypeAndResult() {
+	public void shouldReturnAResponseWithCorrectContentTypeAndResult() throws QueryParseException, IllegalMimeTypeException {
 		final AggregationEngine engine = createEngine(RESULT_SET);
 		final ResultSetFormatter formatter = createFormatter(MIME_TYPE, FORMATTED_RESULT);
 
