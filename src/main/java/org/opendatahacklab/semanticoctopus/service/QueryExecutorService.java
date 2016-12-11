@@ -17,6 +17,11 @@ public interface QueryExecutorService {
 	public static final String CONTENT_TYPE_HEADER_KEY = "Content-type";
 
 	/**
+	 * Key of reponse header for allow origin header, to avoid cross origin request blocks
+	 */
+	public static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY = "Access-Control-Allow-Origin";
+
+	/**
 	 * Executes a certain SPARQL SELECT query
 	 *
 	 * @param query

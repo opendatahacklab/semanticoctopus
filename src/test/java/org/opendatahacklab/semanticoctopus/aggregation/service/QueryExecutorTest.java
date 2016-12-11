@@ -254,7 +254,7 @@ public class QueryExecutorTest {
 	 * @throws UriBuilderException
 	 * @throws IllegalArgumentException
 	 */
-	@Test
+	//@Test
 	public void testQueryExecutionSuccessfulURLPOST()
 					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
 					UnsupportedEncodingException {

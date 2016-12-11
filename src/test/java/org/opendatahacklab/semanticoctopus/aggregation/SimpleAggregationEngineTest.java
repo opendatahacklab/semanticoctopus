@@ -6,6 +6,7 @@ package org.opendatahacklab.semanticoctopus.aggregation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
@@ -77,7 +79,8 @@ public class SimpleAggregationEngineTest {
 	}
 
 	/**
-	 * Perform a query about relatives against the ontology obtained by aggregating a set of ontologies.
+	 * Perform a query about relatives against the ontology obtained by
+	 * aggregating a set of ontologies.
 	 * 
 	 * @param ontologies
 	 *            URL of the ontologies to be aggregated
@@ -114,7 +117,8 @@ public class SimpleAggregationEngineTest {
 	// SIMPLE QUERIES
 
 	/**
-	 * Check that if not ontology is provided as argument, the resulting ontology is empty.
+	 * Check that if not ontology is provided as argument, the resulting
+	 * ontology is empty.
 	 */
 	@Test
 	public void shouldLoadNoOntology() {
@@ -212,7 +216,8 @@ public class SimpleAggregationEngineTest {
 	}
 
 	/**
-	 * Test that inferences are performed when loading ontology A and ontology B and ontology C
+	 * Test that inferences are performed when loading ontology A and ontology B
+	 * and ontology C
 	 */
 	@Test
 	public void shouldInferTuplesWithABC() {
@@ -245,13 +250,28 @@ public class SimpleAggregationEngineTest {
 	public void shouldInferRelationBecauseOfSubproperty() {
 		final AggregationEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
-		final ResultSet actual = engine.execQuery(TESTBED_PREFIX
-				+ "SELECT ?x ?y { ?x testbed:q ?y }");
+		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
 		final QuerySolution s = actual.next();
 		assertEquals(individualA, s.getResource("?x").getURI());
 		assertEquals(individualB, s.getResource("?y").getURI());
 		assertFalse(actual.hasNext());
+	}
+
+	/**
+	 * A QueryParseException is thrown is the submitted string is not a valid
+	 * SPARQL query
+	 */
+	@Test
+	public void shouldThrowAnExceptionOnInvalidQuery() {
+		try {
+			final AggregationEngine engine = new SimpleAggregationEngine(
+					Collections.singletonList(ontologySubproperty));
+			engine.execQuery("An invalid query string");
+			fail("expected exception not thrown");
+		} catch (final QueryParseException e) {
+			// expected exception
+		}
 	}
 
 }

@@ -25,6 +25,7 @@ public interface AggregationEngine {
 	 * @param String
 	 *            query
 	 * @return
+	 * @throws QueryParseException
 	 */
-	ResultSet execQuery(String query);
+	ResultSet execQuery(String query) throws QueryParseException;
 }

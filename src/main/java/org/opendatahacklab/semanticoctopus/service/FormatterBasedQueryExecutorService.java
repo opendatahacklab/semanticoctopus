@@ -1,15 +1,17 @@
 package org.opendatahacklab.semanticoctopus.service;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * An implementation of {@link QueryExecutorService} based on a specifical {@link ResultSetFormatter}
+ * An implementation of {@link QueryExecutorService} based on a specifical
+ * {@link ResultSetFormatter}
  * 
  * @author OOL
  */
@@ -22,7 +24,8 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	private final ResultSetFormatter resultSetFormatter;
 
 	/**
-	 * Constucts a {@link FormatterBasedQueryExecutorService} with specified parameters
+	 * Constucts a {@link FormatterBasedQueryExecutorService} with specified
+	 * parameters
 	 * 
 	 * @param aggregationEngine
 	 *            Engine for query execution
@@ -35,22 +38,27 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 		this.resultSetFormatter = resultSetFormatter;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @see org.opendatahacklab.semanticoctopus.service.QueryExecutorService#execQuery(java.lang.String) */
+	 * @see org.opendatahacklab.semanticoctopus.service.QueryExecutorService#
+	 * execQuery(java.lang.String)
+	 */
 	@Override
 	public Response execQuery(final String query) {
-		final ResultSet resultSet = aggregationEngine.execQuery(query);
-		final String result = resultSetFormatter.format(resultSet);
 		final String mimeType = resultSetFormatter.getMimeType();
-
-		final Response response = generateSuccessfulResponse(result, mimeType);
-
-		return response;
+		try {
+			final ResultSet resultSet = aggregationEngine.execQuery(query);
+			final String result = resultSetFormatter.format(resultSet);
+			return generateSuccessfulResponse(result, mimeType);
+		} catch (final QueryParseException e) {
+			return generateFailureResponse(e, mimeType);
+		}
 	}
 
 	/**
-	 * Generate a successful response according to specified result and mime-type
+	 * Generate a successful response according to specified result and
+	 * mime-type
 	 * 
 	 * @param result
 	 * @param mimeType
@@ -58,10 +66,32 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	 * @return
 	 */
 	public Response generateSuccessfulResponse(final String result, final String mimeType) {
-		final Response response = Response.ok(result).build();
-		final MultivaluedMap<String, Object> headers = response.getHeaders();
-		headers.putSingle(CONTENT_TYPE_HEADER_KEY, mimeType);
-
+		final Response response = addHeaders(Response.ok(result), mimeType).build();
 		return response;
+	}
+
+	/**
+	 * Generate a successful response according to specified result and
+	 * mime-type
+	 * 
+	 * @param e
+	 * @param mimeType
+	 * 
+	 * @return
+	 */
+	public Response generateFailureResponse(final Throwable e, final String mimeType) {
+		final Response response = addHeaders(Response.ok(e), mimeType).build();
+		e.printStackTrace();
+		return response;
+	}
+
+	/**
+	 * Add the required headers to a response.
+	 * 
+	 * @param mimeType
+	 * @return
+	 */
+	private ResponseBuilder addHeaders(final ResponseBuilder r, final String mimeType){
+		return r.header(CONTENT_TYPE_HEADER_KEY, mimeType).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*");
 	}
 }

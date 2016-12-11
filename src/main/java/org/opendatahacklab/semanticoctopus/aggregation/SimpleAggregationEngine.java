@@ -14,6 +14,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -82,10 +83,9 @@ public class SimpleAggregationEngine implements AggregationEngine {
 	 * 
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine#execQuery(java.lang.String) */
 	@Override
-	public ResultSet execQuery(final String query) {
+	public ResultSet execQuery(final String query) throws QueryParseException {
 		final QueryExecution execution = QueryExecutionFactory.create(QueryFactory.create(query), model);
 		final ResultSet resultSet = execution.execSelect();
-
 		return resultSet;
 	}
 }
