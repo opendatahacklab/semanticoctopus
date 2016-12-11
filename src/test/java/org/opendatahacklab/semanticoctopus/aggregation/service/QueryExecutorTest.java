@@ -169,7 +169,7 @@ public class QueryExecutorTest {
 			case GET:
 				return prepareGETInvocationBuilder(MIME_TYPE, QUERY);
 			case URL_ENCODED_POST:
-				return preparePOSTInvocationBuilder(MIME_TYPE, "application/x-www-form-urlencoded", QUERY);
+				return preparePOSTInvocationBuilder(MIME_TYPE, "application/x-www-form-urlencoded", "query="+QUERY);
 			case DIRECT_POST:
 				return preparePOSTInvocationBuilder(MIME_TYPE, "application/sparql-query", QUERY);
 			default:
@@ -254,7 +254,7 @@ public class QueryExecutorTest {
 	 * @throws UriBuilderException
 	 * @throws IllegalArgumentException
 	 */
-	//@Test
+	@Test
 	public void testQueryExecutionSuccessfulURLPOST()
 					throws IllegalMimeTypeException, IllegalArgumentException, UriBuilderException,
 					UnsupportedEncodingException {
