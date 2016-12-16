@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;

@@ -1,7 +1,6 @@
 package org.opendatahacklab.semanticoctopus.service;
 
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
@@ -50,16 +49,6 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 		final String mimeType = resultSetFormatter.getMimeType();
 		final ResultSet resultSet = aggregationEngine.execQuery(query);
 		final String result = resultSetFormatter.format(resultSet);
-		return Response.ok(result).header(CONTENT_TYPE_HEADER_KEY, mimeType).build();
-	}
-
-	/**
-	 * Add the required headers to a response.
-	 * 
-	 * @param mimeType
-	 * @return
-	 */
-	private ResponseBuilder addHeaders(final ResponseBuilder r, final String mimeType) {
-		return r.header(CONTENT_TYPE_HEADER_KEY, mimeType).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*");
+		return Response.ok(result).header(CONTENT_TYPE_HEADER_KEY, mimeType).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*").build();
 	}
 }
