@@ -20,11 +20,10 @@ import com.hp.hpl.jena.query.QueryParseException;
 
 /**
  * Query executor API.<br>
- * It uses an instance of {@link QueryExecutorServiceFactory} to generate a
- * response, containing the result of SELECT query or an error message,
- * according to the latter and requested output format.
+ * It uses an instance of {@link QueryExecutorServiceFactory} to generate a response, containing the result of SELECT
+ * query or an error message, according to the latter and requested output format.
  *
- * @author OOL
+ * @author OOL, Cristiano Longo
  */
 @Path(QueryExecutor.ENDPOINT_NAME)
 public class QueryExecutor {
@@ -75,6 +74,7 @@ public class QueryExecutor {
 			@QueryParam("query") final String query, @QueryParam("default-graph-uri") final String defaultGraphUri,
 			@QueryParam("named-graph-uri") final String namedGraphUri) {
 		logRequest("GET", acceptedFormat, query, defaultGraphUri, namedGraphUri);
+
 		return executeQuery(acceptedFormat, query);
 	}
 
@@ -110,11 +110,14 @@ public class QueryExecutor {
 			throws UnsupportedEncodingException, IllegalRequestBodyException {
 		// URL-encoded, ampersand-separated query parameters.
 		logRequest("POST URLENCODED", acceptedFormat, body, "NA", "NA");
+
 		final Map<String, String> queryParameters = extractParameters(body);
 		final String query = queryParameters.get("query");
 		if (query == null)
 			throw new IllegalRequestBodyException("Missing mandatory query parameter in the request body");
-		System.out.println("Performing query "+query);
+
+		System.out.println("Performing query " + query);
+
 		return executeQuery(acceptedFormat, query);
 	}
 
@@ -135,6 +138,7 @@ public class QueryExecutor {
 				throw new IllegalRequestBodyException("Error parsing in query body " + piece);
 			result.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 		}
+
 		return result;
 	}
 
@@ -168,20 +172,22 @@ public class QueryExecutor {
 			return response;
 		} catch (final IllegalMimeTypeException e) {
 			e.printStackTrace();
-			return createErrorResponse(INVALID_FORMAT_STATUS_CODE); 
-		} catch (final QueryParseException e){
+			return createErrorResponse(INVALID_FORMAT_STATUS_CODE);
+		} catch (final QueryParseException e) {
 			e.printStackTrace();
 			return createErrorResponse(SYNTAX_ERROR_STATUS_CODE);
 		}
 	}
-	
+
 	/**
 	 * Create a response for a failure
 	 * 
 	 * @param statusCode
 	 * @return
 	 */
-	private Response createErrorResponse(final int statusCode){
-		return Response.status(statusCode).header(QueryExecutorService.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*").build();		
+	private Response createErrorResponse(final int statusCode) {
+		return Response.status(statusCode)
+				.header(QueryExecutorService.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*")
+				.build();
 	}
 }
