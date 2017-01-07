@@ -88,7 +88,7 @@ public class SimpleAggregationEngineTest {
 	 *            pairs expected to be returned as result of the relative query
 	 */
 	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
-		final AggregationEngine engine = new SimpleAggregationEngine(ontologies);
+		final QueryEngine engine = new SimpleAggregationEngine(ontologies);
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
@@ -234,7 +234,7 @@ public class SimpleAggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferMemberOfSuperclasses() {
-		final AggregationEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubclass));
+		final QueryEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -248,7 +248,7 @@ public class SimpleAggregationEngineTest {
 	 */
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() {
-		final AggregationEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubproperty));
+		final QueryEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
@@ -265,7 +265,7 @@ public class SimpleAggregationEngineTest {
 	@Test
 	public void shouldThrowAnExceptionOnInvalidQuery() {
 		try {
-			final AggregationEngine engine = new SimpleAggregationEngine(
+			final QueryEngine engine = new SimpleAggregationEngine(
 					Collections.singletonList(ontologySubproperty));
 			engine.execQuery("An invalid query string");
 			fail("expected exception not thrown");

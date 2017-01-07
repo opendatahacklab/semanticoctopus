@@ -24,26 +24,13 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * @author Cristiano Longo
  *
  */
-public class SimpleAggregationEngine implements AggregationEngine {
+public class SimpleAggregationEngine implements QueryEngine {
 
 	private final List<URL> ontologyURLs;
 	private final OntModel model;
 
 	public SimpleAggregationEngine() {
-		final List<URL> ont = new ArrayList<URL>();
-		try {
-			final URL ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
-			final URL ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
-			final URL ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
-			ont.add(ontologyA);
-			ont.add(ontologyB);
-			ont.add(ontologyC);
-		} catch (final MalformedURLException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-		this.ontologyURLs = Collections.unmodifiableList(ont);
-		this.model = download(ontologyURLs);
+		this(new ArrayList<URL>());
 	}
 
 	/**

@@ -1,12 +1,12 @@
 package org.opendatahacklab.semanticoctopus.service;
 
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider;
 
 /**
- * An implementation of {@link QueryExecutorServiceFactory} based on an instance of {@link AggregationEngine} which
+ * An implementation of {@link QueryExecutorServiceFactory} based on an instance of {@link QueryEngine} which
  * generates {@link FormatterBasedQueryExecutorService}s
  *
  * @author OOL
@@ -14,7 +14,7 @@ import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider
 public class FormatterBasedQueryExecutorServiceFactory implements QueryExecutorServiceFactory {
 
 	// Engine for query executions
-	private final AggregationEngine aggregationEngine;
+	private final QueryEngine aggregationEngine;
 
 	// Provider of formatters
 	private final ResultSetFormatterProvider formatterProvider;
@@ -26,7 +26,7 @@ public class FormatterBasedQueryExecutorServiceFactory implements QueryExecutorS
 	 * @param aggregationEngine
 	 * @param formatterProvider
 	 */
-	public FormatterBasedQueryExecutorServiceFactory(final AggregationEngine aggregationEngine,
+	public FormatterBasedQueryExecutorServiceFactory(final QueryEngine aggregationEngine,
 					final ResultSetFormatterProvider formatterProvider) {
 		this.aggregationEngine = aggregationEngine;
 		this.formatterProvider = formatterProvider;

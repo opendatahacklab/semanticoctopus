@@ -9,7 +9,7 @@ import com.hp.hpl.jena.query.*;
  * 
  * @author Cristiano Longo, OOL
  */
-public interface AggregationEngine {
+public interface QueryEngine {
 
 	/**
 	 * Write the ontology on the specified stream

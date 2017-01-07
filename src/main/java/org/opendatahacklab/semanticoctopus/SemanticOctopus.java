@@ -11,7 +11,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.SimpleAggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider;
@@ -44,7 +44,7 @@ public class SemanticOctopus {
 		}
 
 		try {
-			final AggregationEngine engine = generateEngine(args);
+			final QueryEngine engine = generateEngine(args);
 			final QueryExecutor executor = generateQueryExecutor(engine);
 			generateAndStartServer(args[0], Integer.parseInt(args[1]), executor);
 		} catch (final NumberFormatException e) {
@@ -78,9 +78,9 @@ public class SemanticOctopus {
 	 * 
 	 * @throws MalformedURLException
 	 */
-	private static AggregationEngine generateEngine(final String[] args) throws MalformedURLException {
+	private static QueryEngine generateEngine(final String[] args) throws MalformedURLException {
 		final List<URL> ontologies = loadOntologies(args);
-		final AggregationEngine engine = new SimpleAggregationEngine(ontologies);
+		final QueryEngine engine = new SimpleAggregationEngine(ontologies);
 
 		return engine;
 	}
@@ -90,7 +90,7 @@ public class SemanticOctopus {
 	 * 
 	 * @return
 	 */
-	private static QueryExecutor generateQueryExecutor(final AggregationEngine engine) {
+	private static QueryExecutor generateQueryExecutor(final QueryEngine engine) {
 		final ResultSetFormatterProvider formatterProvider = new ResultSetFormatterProvider();
 		final FormatterBasedQueryExecutorServiceFactory serviceFactory = new FormatterBasedQueryExecutorServiceFactory(
 				engine, formatterProvider);

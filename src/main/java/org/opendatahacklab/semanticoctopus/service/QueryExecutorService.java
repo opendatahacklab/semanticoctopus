@@ -2,13 +2,13 @@ package org.opendatahacklab.semanticoctopus.service;
 
 import javax.ws.rs.core.Response;
 
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 
 import com.hp.hpl.jena.query.QueryParseException;
 
 /**
- * A service for SPARQL query execution by an {@link AggregationEngine}
+ * A service for SPARQL query execution by an {@link QueryEngine}
  *
  * @author OOL
  */

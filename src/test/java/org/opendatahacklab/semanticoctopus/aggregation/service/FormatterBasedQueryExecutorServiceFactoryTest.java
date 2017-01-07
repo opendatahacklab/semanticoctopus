@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider;
@@ -31,7 +31,7 @@ public class FormatterBasedQueryExecutorServiceFactoryTest {
 	 *
 	 * @return
 	 */
-	private QueryExecutorServiceFactory createTestSubject(final AggregationEngine aggregationEngine,
+	private QueryExecutorServiceFactory createTestSubject(final QueryEngine aggregationEngine,
 					final ResultSetFormatterProvider formatterProvider) {
 		return new FormatterBasedQueryExecutorServiceFactory(aggregationEngine, formatterProvider);
 	}
@@ -39,8 +39,8 @@ public class FormatterBasedQueryExecutorServiceFactoryTest {
 	/**
 	 * @return
 	 */
-	private AggregationEngine createAggregationEngine() {
-		final AggregationEngine aggregator = mock(AggregationEngine.class);
+	private QueryEngine createAggregationEngine() {
+		final QueryEngine aggregator = mock(QueryEngine.class);
 		// when(aggregator.execQuery(anyString())).thenReturn(RESULT_SET);
 
 		return aggregator;
@@ -81,7 +81,7 @@ public class FormatterBasedQueryExecutorServiceFactoryTest {
 	 */
 	@Test
 	public void shouldCreateService() throws IllegalMimeTypeException {
-		final AggregationEngine aggregator = createAggregationEngine();
+		final QueryEngine aggregator = createAggregationEngine();
 		final ResultSetFormatterProvider formatterProvider = createFormatterProvider(false);
 
 		final QueryExecutorServiceFactory testSubject = createTestSubject(aggregator, formatterProvider);
@@ -95,7 +95,7 @@ public class FormatterBasedQueryExecutorServiceFactoryTest {
 	 */
 	@Test
 	public void shouldRaiseException() throws IllegalMimeTypeException {
-		final AggregationEngine aggregator = createAggregationEngine();
+		final QueryEngine aggregator = createAggregationEngine();
 		final ResultSetFormatterProvider formatterProvider = createFormatterProvider(true);
 
 		final QueryExecutorServiceFactory testSubject = createTestSubject(aggregator, formatterProvider);

@@ -10,7 +10,7 @@ import static org.opendatahacklab.semanticoctopus.service.QueryExecutorService.C
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorService;
@@ -38,7 +38,7 @@ public class FormatterBasedQueryExecutorServiceTest {
 	 * 
 	 * @return
 	 */
-	private QueryExecutorService createTestSubject(final AggregationEngine engine, final ResultSetFormatter formatter) {
+	private QueryExecutorService createTestSubject(final QueryEngine engine, final ResultSetFormatter formatter) {
 		return new FormatterBasedQueryExecutorService(engine, formatter);
 	}
 
@@ -47,8 +47,8 @@ public class FormatterBasedQueryExecutorServiceTest {
 	 * 
 	 * @return
 	 */
-	private AggregationEngine createEngine(final ResultSet setToReturn) {
-		final AggregationEngine engine = mock(AggregationEngine.class);
+	private QueryEngine createEngine(final ResultSet setToReturn) {
+		final QueryEngine engine = mock(QueryEngine.class);
 		when(engine.execQuery(anyString())).thenReturn(setToReturn);
 
 		return engine;
@@ -75,7 +75,7 @@ public class FormatterBasedQueryExecutorServiceTest {
 	 */
 	@Test
 	public void shouldReturnAResponseWithCorrectContentTypeAndResult() throws QueryParseException, IllegalMimeTypeException {
-		final AggregationEngine engine = createEngine(RESULT_SET);
+		final QueryEngine engine = createEngine(RESULT_SET);
 		final ResultSetFormatter formatter = createFormatter(MIME_TYPE, FORMATTED_RESULT);
 
 		final QueryExecutorService testSubject = createTestSubject(engine, formatter);

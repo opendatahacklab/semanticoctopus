@@ -2,7 +2,7 @@ package org.opendatahacklab.semanticoctopus.service;
 
 import javax.ws.rs.core.Response;
 
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatter;
 
@@ -18,7 +18,7 @@ import com.hp.hpl.jena.query.ResultSet;
 public class FormatterBasedQueryExecutorService implements QueryExecutorService {
 
 	// Engine for query execution
-	private final AggregationEngine aggregationEngine;
+	private final QueryEngine aggregationEngine;
 
 	// Formatter of result set after query execution
 	private final ResultSetFormatter resultSetFormatter;
@@ -32,7 +32,7 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	 * @param resultSetFormatter
 	 *            Formatter of result set after query execution
 	 */
-	public FormatterBasedQueryExecutorService(final AggregationEngine aggregationEngine,
+	public FormatterBasedQueryExecutorService(final QueryEngine aggregationEngine,
 			final ResultSetFormatter resultSetFormatter) {
 		this.aggregationEngine = aggregationEngine;
 		this.resultSetFormatter = resultSetFormatter;
