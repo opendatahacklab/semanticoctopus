@@ -10,8 +10,7 @@ import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * An implementation of {@link QueryExecutorService} based on a specifical
- * {@link ResultSetFormatter}
+ * An implementation of {@link QueryExecutorService} based on a specifical {@link ResultSetFormatter}
  * 
  * @author OOL
  */
@@ -24,8 +23,7 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 	private final ResultSetFormatter resultSetFormatter;
 
 	/**
-	 * Constucts a {@link FormatterBasedQueryExecutorService} with specified
-	 * parameters
+	 * Constucts a {@link FormatterBasedQueryExecutorService} with specified parameters
 	 * 
 	 * @param aggregationEngine
 	 *            Engine for query execution
@@ -38,17 +36,18 @@ public class FormatterBasedQueryExecutorService implements QueryExecutorService 
 		this.resultSetFormatter = resultSetFormatter;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * 
-	 * @see org.opendatahacklab.semanticoctopus.service.QueryExecutorService#
-	 * execQuery(java.lang.String)
-	 */
+	 * @see org.opendatahacklab.semanticoctopus.service.QueryExecutorService# execQuery(java.lang.String) */
 	@Override
 	public Response execQuery(final String query) throws QueryParseException, IllegalMimeTypeException {
 		final String mimeType = resultSetFormatter.getMimeType();
 		final ResultSet resultSet = aggregationEngine.execQuery(query);
 		final String result = resultSetFormatter.format(resultSet);
-		return Response.ok(result).header(CONTENT_TYPE_HEADER_KEY, mimeType).header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*").build();
+
+		return Response.ok(result)
+				.header(CONTENT_TYPE_HEADER_KEY, mimeType)
+				.header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_KEY, "*")
+				.build();
 	}
 }

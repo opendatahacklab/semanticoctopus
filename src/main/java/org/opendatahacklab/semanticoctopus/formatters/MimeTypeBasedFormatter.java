@@ -12,17 +12,18 @@ import com.hp.hpl.jena.query.ResultSet;
  */
 enum MimeTypeBasedFormatter implements ResultSetFormatter {
 
-	ALL("*/*"){
+	ALL("*/*") {
+
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			com.hp.hpl.jena.query.ResultSetFormatter.outputAsCSV(outputStream, resultSet);
-		}		
+		}
 	},
-	
+
 	CSV("text/csv") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			com.hp.hpl.jena.query.ResultSetFormatter.outputAsCSV(outputStream, resultSet);
 		}
 	},
@@ -30,7 +31,7 @@ enum MimeTypeBasedFormatter implements ResultSetFormatter {
 	TSV("text/tab-separated-values") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			com.hp.hpl.jena.query.ResultSetFormatter.outputAsTSV(outputStream, resultSet);
 		}
 	},
@@ -38,7 +39,7 @@ enum MimeTypeBasedFormatter implements ResultSetFormatter {
 	SPARQL_JSON("application/sparql-results+json") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			com.hp.hpl.jena.query.ResultSetFormatter.outputAsJSON(outputStream, resultSet);
 		}
 	},
@@ -46,7 +47,7 @@ enum MimeTypeBasedFormatter implements ResultSetFormatter {
 	JSON("application/json") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			SPARQL_JSON.formatInternally(outputStream, resultSet);
 		}
 	},
@@ -54,14 +55,14 @@ enum MimeTypeBasedFormatter implements ResultSetFormatter {
 	SPARQL_XML("application/sparql-results+xml") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			com.hp.hpl.jena.query.ResultSetFormatter.outputAsXML(outputStream, resultSet);
 		}
 	},
 	XML("application/xml") {
 
 		@Override
-		public void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
+		protected void formatInternally(final OutputStream outputStream, final ResultSet resultSet) {
 			SPARQL_XML.formatInternally(outputStream, resultSet);
 		}
 	};
