@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>opendatahacklab - semantic octopus</title>
+<link rel="stylesheet" type="text/css" href="../commons/css/odhl.css">
+<script type="text/javascript"
+	src="http://opendatahacklab.org/sparql_suite3.0/sparql_processor.js"></script>
+</head>
+<body>
+	<header class="main-header">
+		<img class="logo" src="../commons/imgs/logo_cog4_ter.png"
+			alt="the opendatahacklab logo">
+		<h1>opendatahacklab - semantic octopus</h1>
+		<p class="subtitle">
+			THE OPEN DATA HACKING LABORATORY - Powered by <a
+				href="http://dydra.com"><img alt="dydra.com"
+				src="../commons/imgs/dydra-logo-24pt.png"></a> <a class="wt-tech"
+				target="_blank" href="http://wt-tech.it">WT-TECH</a>
+		</p>
+		<nav>
+			<ol class="breadcrumb">
+				<li><a href="http://opendatahacklab.org/site/index.html">home</a></li>
+				<li><a href="http://opendatahacklab.org/site/projects.html">projects</a></li>
+				<li>semantic octopus</li>
+			</ol>
+			<a href="https://github.com/opendatahacklab/semanticoctopus.git"
+				alt="Source Code" title="GitHub repository"><img alt="GitHub"
+				src="../commons/imgs/GitHub-Mark-64px.png"></a> 
+		</nav>
+	</header>
+	<section>
+		<header>
+			<h2>INTRODUCTION</h2>
+		</header>
+		<p>
+			The <em>Semantic Octopus</em> is a java application which allows one to
+			publish a <a href="https://www.w3.org/TR/sparql11-overview/" title="SPARQL 1.1 Overview">SPARQL</a> 
+			endpoint providing a knowledge base obtained by aggregating
+			multiple <a href="https://www.w3.org/TR/rdf11-primer/" title="RDF 1.1 Primer">RDF</a> 
+			knowledge bases from the web and performing subsequent reasoning. 
+		</p>				
+	</section>
+
+	<section>
+		<header>
+			<h2>COMPILE AND INSTALL</h2>
+		</header>
+		<p>
+			<em>Semantic Octopus</em> can be compiled from sources with 
+			<a href="https://maven.apache.org/">maven</a> (just run <code>mvn install</code> in
+			the sources root). After compilation you will find a <code>semanticoctopus-[vers]-jar-with-dependencies.jar</code>
+			file in the maven-generated <code>target</code> directory. The endpoint
+			can be setup with the following command:
+		</p>				
+		<code><pre>
+java -jar semanticoctopus-version-jar-with-dependencies.jar endpointhost enpointport kburl1 [kburl2 [... kburln]] 
+		</pre></code>
+		<p>where
+		<ol>
+			<li><code>version</code> is the semantic octopus version;</li>
+			<li><code>endpointhost</code> is the host name under which the aggregated ontology will be provided;</li>
+			<li><code>enpointport</code> is the endpoint port; </li>
+			<li><code>kburl1</code>, ..., <code>kburln</code> are the URLs of the ontologies to be aggregated.</li>
+		</ol>
+		</p>
+		<p>
+		For example, the following will start a sparql endpoint at port 9001 of localhost which
+		provide the main opendatahacklab projects and events knowledge base.		
+		</p>
+		<code><pre>
+java -jar semanticoctopus-0.1.2-jar-with-dependencies.jar http://localhost 9000 http://opendatahacklab.org/site/odhl.owl
+		</pre></code>
+	</section>
+
+	<section>
+		<header>
+			<h2>CONTRIBUTORS</h2>
+		</header>
+		<ul>
+			<li>Cristiano Longo</li>
+			<li>Giambattista Pisasale</li>
+			<li>Gabriella Verga</li>
+		</ul>
+	</section>
+</body>
+</html>
