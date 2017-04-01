@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,12 +23,13 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * Test cases for the {@link SimpleAggregationEngine}
+ * Generic tests to check that an aggregation mechanism works and performs
+ * inferences
  * 
  * @author Cristiano Longo
  *
  */
-public class SimpleAggregationEngineTest {
+public abstract class AbstractAggregationTest {
 
 	private static final String TESTBED_PREFIX = "PREFIX testbed:<http://opendatahacklab.org/semanticoctopus/testbed/>\n";
 	private static final String RELATIVES_QUERY = TESTBED_PREFIX
@@ -65,7 +67,7 @@ public class SimpleAggregationEngineTest {
 	 * @throws MalformedURLException
 	 * 
 	 */
-	public SimpleAggregationEngineTest() throws MalformedURLException {
+	public AbstractAggregationTest() throws MalformedURLException {
 		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");
 		ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
@@ -86,9 +88,11 @@ public class SimpleAggregationEngineTest {
 	 *            URL of the ontologies to be aggregated
 	 * @param expected
 	 *            pairs expected to be returned as result of the relative query
+	 * @throws InterruptedException
 	 */
-	private void testRelatives(final List<URL> ontologies, final List<RelativePair> expected) {
-		final QueryEngine engine = new SimpleAggregationEngine(ontologies);
+	private void testRelatives(final Collection<URL> ontologies, final List<RelativePair> expected)
+			throws InterruptedException {
+		final QueryEngine engine = createTestSubject(ontologies);
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
@@ -105,12 +109,23 @@ public class SimpleAggregationEngineTest {
 	}
 
 	/**
+	 * Create a query engine whose underlying model is the result of the
+	 * aggregation of the specified ontologies
+	 * 
+	 * @param ontologies
+	 * @return
+	 * @throws InterruptedException
+	 */
+	public abstract QueryEngine createTestSubject(final Collection<URL> ontologies) throws InterruptedException;
+
+	/**
 	 * Convenience method
 	 * 
 	 * @param ontologies
 	 * @param expected
+	 * @throws InterruptedException
 	 */
-	private void testRelatives(final URL[] ontologies, final RelativePair[] expected) {
+	private void testRelatives(final URL[] ontologies, final RelativePair[] expected) throws InterruptedException {
 		testRelatives(Arrays.asList(ontologies), Arrays.asList(expected));
 	}
 
@@ -119,17 +134,21 @@ public class SimpleAggregationEngineTest {
 	/**
 	 * Check that if not ontology is provided as argument, the resulting
 	 * ontology is empty.
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldLoadNoOntology() {
+	public void shouldLoadNoOntology() throws InterruptedException {
 		testRelatives(new URL[0], new RelativePair[0]);
 	}
 
 	/**
 	 * Check loading a single ontology
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldLoadOneOntologyWithARelativeAssertion() {
+	public void shouldLoadOneOntologyWithARelativeAssertion() throws InterruptedException {
 		final URL[] ontologies = { ontologyA };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
 		testRelatives(ontologies, expected);
@@ -137,9 +156,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Check loading a multiple ontologies
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldLoadSeveralOntologiesWithSeveralRelativeAssertions() {
+	public void shouldLoadSeveralOntologiesWithSeveralRelativeAssertions() throws InterruptedException {
 		final URL[] ontologies = { ontologyA, ontologyB, ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualB, individualC), new RelativePair(individualC, individualD) };
@@ -150,9 +171,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that no inference is performed when just the ontology A is loaded
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferNoTuplesWithA() {
+	public void shouldInferNoTuplesWithA() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyA };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
 		testRelatives(ontologies, expected);
@@ -161,9 +184,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that no inference is performed when just the ontology B is loaded
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferNoTuplesWithB() {
+	public void shouldInferNoTuplesWithB() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyB };
 		final RelativePair[] expected = { new RelativePair(individualB, individualC) };
 		testRelatives(ontologies, expected);
@@ -172,9 +197,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that no inference is performed when just the ontology C is loaded
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferNoTuplesWithC() {
+	public void shouldInferNoTuplesWithC() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
@@ -183,9 +210,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that inferences are performed when loading ontology A and ontology B
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferTuplesWithAB() {
+	public void shouldInferTuplesWithAB() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyA, ontologyB };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC) };
@@ -194,9 +223,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that no inference is performed when ontologies A and C are loaded
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferNoTuplesWithAC() {
+	public void shouldInferNoTuplesWithAC() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyA, ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualC, individualD) };
@@ -206,9 +237,11 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test that inferences are performed when loading ontology B and ontology C
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferTuplesWithBC() {
+	public void shouldInferTuplesWithBC() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyB, ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualB, individualC),
 				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
@@ -218,9 +251,11 @@ public class SimpleAggregationEngineTest {
 	/**
 	 * Test that inferences are performed when loading ontology A and ontology B
 	 * and ontology C
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferTuplesWithABC() {
+	public void shouldInferTuplesWithABC() throws InterruptedException {
 		final URL[] ontologies = { vocabulary, ontologyA, ontologyB, ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualA, individualC), new RelativePair(individualA, individualD),
@@ -231,10 +266,12 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test for reasoning in presence of subclass assertion
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferMemberOfSuperclasses() {
-		final QueryEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubclass));
+	public void shouldInferMemberOfSuperclasses() throws InterruptedException {
+		final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -245,10 +282,12 @@ public class SimpleAggregationEngineTest {
 
 	/**
 	 * Test for reasoning in presence of subproperty assertion
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldInferRelationBecauseOfSubproperty() {
-		final QueryEngine engine = new SimpleAggregationEngine(Collections.singletonList(ontologySubproperty));
+	public void shouldInferRelationBecauseOfSubproperty() throws InterruptedException {
+		final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
@@ -261,12 +300,13 @@ public class SimpleAggregationEngineTest {
 	/**
 	 * A QueryParseException is thrown is the submitted string is not a valid
 	 * SPARQL query
+	 * 
+	 * @throws InterruptedException
 	 */
 	@Test
-	public void shouldThrowAnExceptionOnInvalidQuery() {
+	public void shouldThrowAnExceptionOnInvalidQuery() throws InterruptedException {
 		try {
-			final QueryEngine engine = new SimpleAggregationEngine(
-					Collections.singletonList(ontologySubproperty));
+			final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubproperty));
 			engine.execQuery("An invalid query string");
 			fail("expected exception not thrown");
 		} catch (final QueryParseException e) {

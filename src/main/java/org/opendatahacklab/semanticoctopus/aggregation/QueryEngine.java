@@ -1,11 +1,12 @@
 package org.opendatahacklab.semanticoctopus.aggregation;
 
-import java.io.*;
+import java.io.OutputStream;
 
-import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * An engine for executing queries against aggregated ontologies
+ * An engine for executing queries against an underlying knowledge base
  * 
  * @author Cristiano Longo, OOL
  */
