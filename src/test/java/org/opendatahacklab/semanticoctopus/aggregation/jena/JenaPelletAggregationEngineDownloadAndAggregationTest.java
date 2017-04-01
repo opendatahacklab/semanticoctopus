@@ -19,6 +19,8 @@ import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
 
 /**
+ * TODO remove this
+ * 
  * @author Cristiano Longo
  *
  */
@@ -42,7 +44,7 @@ public class JenaPelletAggregationEngineDownloadAndAggregationTest extends Abstr
 	public QueryEngine createTestSubject(final Collection<URL> ontologies) throws InterruptedException {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		final AggregationEngine engine = new AsyncAggregationEngine(
-				JenaPelletSeqDownloadTask.createFactory(ontologies), executor);
+				new JenaPelletQueryEngineFactory(ontologies), executor);
 		assertSame(AggregationEngine.State.IDLE, engine.getState());
 		engine.build();
 		executor.shutdown();

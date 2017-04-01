@@ -5,10 +5,11 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
+import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngineListener;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletSeqDownloadTask;
+import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletQueryEngineFactory;
 
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
@@ -22,7 +23,7 @@ import com.hp.hpl.jena.query.ResultSet;
  */
 public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwloadHandler {
 
-	private final OntologyDownloadTaskFactory downloadTaskFactory;
+	private final AggregatedQueryEngineFactory downloadTaskFactory;
 	private final Executor downloadExecutor;
 	private AsyncAggregationEngineState state = null;
 
@@ -36,11 +37,11 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 *            the {@link Executor} which will be used to perform the
 	 *            download task. It is expected to run in another thread.
 	 */
-	public AsyncAggregationEngine(final OntologyDownloadTaskFactory downloadTaskFactory,
+	public AsyncAggregationEngine(final AggregatedQueryEngineFactory downloadTaskFactory,
 			Executor donwloadExecutor) {
 		this.downloadTaskFactory = downloadTaskFactory;
 		this.downloadExecutor=donwloadExecutor;
-		state = new AsyncAggregationEngineIdleState();
+		state = new AsyncAggregationEngineIdleState(downloadTaskFactory.getEmpty());
 	}
 
 	/**
@@ -53,9 +54,9 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 *            the {@link Executor} which will be used to perform the
 	 *            download task. It is expected to run in another thread.
 	 */
-	public AsyncAggregationEngine(final Collection<URL> ontologyURLs, final OntologyDownloadTaskFactory downloader,
+	public AsyncAggregationEngine(final Collection<URL> ontologyURLs, final AggregatedQueryEngineFactory downloader,
 			Executor donwloadExecutor) {
-		this(JenaPelletSeqDownloadTask.createFactory(ontologyURLs), donwloadExecutor);
+		this(new JenaPelletQueryEngineFactory(ontologyURLs), donwloadExecutor);
 	}
 
 	/*

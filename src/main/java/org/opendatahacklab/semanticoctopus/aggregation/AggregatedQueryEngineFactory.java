@@ -1,10 +1,12 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.async;
+package org.opendatahacklab.semanticoctopus.aggregation;
 
 import java.net.URL;
 import java.util.Collection;
+
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
 
 /**
  * Factory to create {@link Runnable} instances to load a model by aggregating a
@@ -13,7 +15,7 @@ import java.util.Collection;
  * @author Cristiano Longo
  *
  */
-public interface OntologyDownloadTaskFactory {
+public interface AggregatedQueryEngineFactory {
 
 	/**
 	 * URL of ontologies which will be aggregated by the download tasks
@@ -23,6 +25,11 @@ public interface OntologyDownloadTaskFactory {
 	 */
 	Collection<URL> getOntologies();
 
+	/**
+	 * @return a query engine providing an empty ontology
+	 */
+	QueryEngine getEmpty();
+	
 	/**
 	 * Create a task which will perform download. Download results will be
 	 * notified to the handler.

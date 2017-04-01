@@ -6,6 +6,7 @@ package org.opendatahacklab.semanticoctopus.aggregation.async;
 import java.io.OutputStream;
 import java.util.concurrent.Executor;
 
+import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
@@ -21,12 +22,19 @@ import com.hp.hpl.jena.query.ResultSet;
 abstract class AsyncAggregationEngineState {
 
 	private final AggregationEngine.State stateLabel;
+	private final QueryEngine delegate;
 
 	/**
+	 * @param delegate TODO
 	 * 
 	 */
-	public AsyncAggregationEngineState(final AggregationEngine.State stateLabel) {
+	/**
+	 * @param stateLabel
+	 * @param delegate the delegate used to perform queries
+	 */
+	public AsyncAggregationEngineState(final AggregationEngine.State stateLabel, QueryEngine delegate) {
 		this.stateLabel = stateLabel;
+		this.delegate=delegate;
 	}
 
 	/**
@@ -43,7 +51,9 @@ abstract class AsyncAggregationEngineState {
 	 * @return
 	 * @throws QueryParseException
 	 */
-	public abstract ResultSet execQuery(final String query) throws QueryParseException;
+	public final ResultSet execQuery(final String query) throws QueryParseException{
+		return delegate.execQuery(query);
+	}
 
 	/**
 	 * Write out the current knowledge base
@@ -51,13 +61,15 @@ abstract class AsyncAggregationEngineState {
 	 * @param out
 	 * @param baseUri
 	 */
-	public abstract void write(final OutputStream out, final String baseUri);
+	public final void write(final OutputStream out, final String baseUri){
+		delegate.write(out, baseUri);
+	}
 
 	/**
 	 * @param downloadExecutor TODO
 	 * @return the destination state
 	 */
-	public abstract AsyncAggregationEngineState build(final OntologyDownloadTaskFactory downloadTaskFactory,
+	public abstract AsyncAggregationEngineState build(final AggregatedQueryEngineFactory downloadTaskFactory,
 			final Executor downloadExecutor, final OntologyDonwloadHandler handler);
 
 	/**
@@ -76,4 +88,12 @@ abstract class AsyncAggregationEngineState {
 	 */
 	public abstract AsyncAggregationEngineState error(OntologyDownloadError error);
 
+	/**
+	 * Get the delegate query engine actually in use
+	 * 
+	 * @return
+	 */
+	protected QueryEngine getDelegate(){
+		return delegate;
+	}
 }

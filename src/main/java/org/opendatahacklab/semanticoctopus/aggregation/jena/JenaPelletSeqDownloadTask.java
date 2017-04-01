@@ -5,14 +5,10 @@ package org.opendatahacklab.semanticoctopus.aggregation.jena;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
 import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadError;
-import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadTaskFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -56,35 +52,5 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 				model.close();
 			}
 		handler.complete(new JenaQueryEngine(model));
-	}
-
-	/**
-	 * Create a factory for {@link JenaPelletSeqDownloadTask} to download the
-	 * specified set of ontologies
-	 * 
-	 * @param ontologyURLs
-	 * @return
-	 */
-	public static OntologyDownloadTaskFactory createFactory(final Collection<URL> ontologyURLs) {
-		final Set<URL> urls = new TreeSet<>(new Comparator<URL>() {
-
-			@Override
-			public int compare(final URL o1, final URL o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
-		urls.addAll(ontologyURLs);
-		return new OntologyDownloadTaskFactory() {
-
-			@Override
-			public Collection<URL> getOntologies() {
-				return urls;
-			}
-
-			@Override
-			public Runnable getDownloadTask(OntologyDonwloadHandler handler) {
-				return new JenaPelletSeqDownloadTask(ontologyURLs, handler);
-			}
-		};
 	}
 }

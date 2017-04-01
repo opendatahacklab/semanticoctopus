@@ -41,7 +41,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 	@Override
 	public QueryEngine createTestSubject(final Collection<URL> ontologies) {
 		final AtomicReference<QueryEngine> queryReference = new AtomicReference<QueryEngine>(null);
-		final Runnable downloadTask = JenaPelletSeqDownloadTask.createFactory(ontologies)
+		final Runnable downloadTask = (new JenaPelletQueryEngineFactory(ontologies))
 				.getDownloadTask(new OntologyDonwloadHandler() {
 
 					@Override
