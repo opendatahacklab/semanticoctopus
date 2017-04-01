@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.net.URI;
 import java.net.URL;

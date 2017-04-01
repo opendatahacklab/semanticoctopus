@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
 import java.util.concurrent.Executor;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
@@ -18,14 +18,14 @@ import com.hp.hpl.jena.query.ResultSet;
  * @author cristiano longo
  *
  */
-abstract class JenaPelletAggregationEngineState {
+abstract class AsyncAggregationEngineState {
 
 	private final AggregationEngine.State stateLabel;
 
 	/**
 	 * 
 	 */
-	public JenaPelletAggregationEngineState(final AggregationEngine.State stateLabel) {
+	public AsyncAggregationEngineState(final AggregationEngine.State stateLabel) {
 		this.stateLabel = stateLabel;
 	}
 
@@ -57,7 +57,7 @@ abstract class JenaPelletAggregationEngineState {
 	 * @param downloadExecutor TODO
 	 * @return the destination state
 	 */
-	public abstract JenaPelletAggregationEngineState build(final OntologyDownloadTaskFactory downloadTaskFactory,
+	public abstract AsyncAggregationEngineState build(final OntologyDownloadTaskFactory downloadTaskFactory,
 			final Executor downloadExecutor, final OntologyDonwloadHandler handler);
 
 	/**
@@ -66,7 +66,7 @@ abstract class JenaPelletAggregationEngineState {
 	 * @param result
 	 * @return the destination state
 	 */
-	public abstract JenaPelletAggregationEngineState complete(OntModel result);
+	public abstract AsyncAggregationEngineState complete(QueryEngine result);
 
 	/**
 	 * Handle the download error event
@@ -74,6 +74,6 @@ abstract class JenaPelletAggregationEngineState {
 	 * @param error
 	 * @return the destination state
 	 */
-	public abstract JenaPelletAggregationEngineState error(OntologyDownloadError error);
+	public abstract AsyncAggregationEngineState error(OntologyDownloadError error);
 
 }

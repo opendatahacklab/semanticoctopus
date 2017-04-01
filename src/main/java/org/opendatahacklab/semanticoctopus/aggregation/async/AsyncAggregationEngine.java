@@ -1,4 +1,4 @@
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
 import java.net.URL;
@@ -7,8 +7,9 @@ import java.util.concurrent.Executor;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngineListener;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletSeqDownloadTask;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
@@ -19,29 +20,27 @@ import com.hp.hpl.jena.query.ResultSet;
  * @author Cristiano Longo
  *
  */
-public class JenaPelletAggregationEngine implements AggregationEngine, OntologyDonwloadHandler {
+public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwloadHandler {
 
 	private final OntologyDownloadTaskFactory downloadTaskFactory;
 	private final Executor downloadExecutor;
-	private JenaPelletAggregationEngineState state = null;
+	private AsyncAggregationEngineState state = null;
 
 	/**
 	 * Create an aggregation engine which will use the specified download task
 	 * factory to generate the model.
 	 * 
-	 * @param ontologyURLs
-	 *            the ontologies to be aggregated
 	 * @param downloadTaskFactory
 	 *            a delegate for ontology downloads
 	 * @param donwloadExecutor
 	 *            the {@link Executor} which will be used to perform the
 	 *            download task. It is expected to run in another thread.
 	 */
-	public JenaPelletAggregationEngine(final OntologyDownloadTaskFactory downloadTaskFactory,
+	public AsyncAggregationEngine(final OntologyDownloadTaskFactory downloadTaskFactory,
 			Executor donwloadExecutor) {
 		this.downloadTaskFactory = downloadTaskFactory;
 		this.downloadExecutor=donwloadExecutor;
-		state = new JenaPelletAggregationEngineIdleState();
+		state = new AsyncAggregationEngineIdleState();
 	}
 
 	/**
@@ -54,7 +53,7 @@ public class JenaPelletAggregationEngine implements AggregationEngine, OntologyD
 	 *            the {@link Executor} which will be used to perform the
 	 *            download task. It is expected to run in another thread.
 	 */
-	public JenaPelletAggregationEngine(final Collection<URL> ontologyURLs, final OntologyDownloadTaskFactory downloader,
+	public AsyncAggregationEngine(final Collection<URL> ontologyURLs, final OntologyDownloadTaskFactory downloader,
 			Executor donwloadExecutor) {
 		this(JenaPelletSeqDownloadTask.createFactory(ontologyURLs), donwloadExecutor);
 	}
@@ -104,7 +103,7 @@ public class JenaPelletAggregationEngine implements AggregationEngine, OntologyD
 	 */
 	@Override
 	public synchronized void build() {
-		final JenaPelletAggregationEngineState destState = state.build(downloadTaskFactory, downloadExecutor, this);
+		final AsyncAggregationEngineState destState = state.build(downloadTaskFactory, downloadExecutor, this);
 		// TODO notify listeners
 		state = destState;
 	}
@@ -139,8 +138,8 @@ public class JenaPelletAggregationEngine implements AggregationEngine, OntologyD
 	 * OntologyDonwloadHandler#complete(com.hp.hpl.jena.ontology.OntModel)
 	 */
 	@Override
-	public synchronized void complete(final OntModel result) {
-		final JenaPelletAggregationEngineState newState = state.complete(result);
+	public synchronized void complete(final QueryEngine result) {
+		final AsyncAggregationEngineState newState = state.complete(result);
 		// TODO notify listeners
 		state = newState;
 	}
@@ -154,7 +153,7 @@ public class JenaPelletAggregationEngine implements AggregationEngine, OntologyD
 	 */
 	@Override
 	public synchronized void error(OntologyDownloadError error) {
-		final JenaPelletAggregationEngineState newState = state.error(error);
+		final AsyncAggregationEngineState newState = state.error(error);
 		// TODO notify listeners
 		state = newState;
 	}

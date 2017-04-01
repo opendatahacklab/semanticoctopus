@@ -1,12 +1,10 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.net.URL;
 import java.util.Collection;
-
-import org.opendatahacklab.semanticoctopus.aggregation.OntologyAggregationException;
 
 /**
  * Factory to create {@link Runnable} instances to load a model by aggregating a
@@ -33,8 +31,6 @@ public interface OntologyDownloadTaskFactory {
 	 * 
 	 * @return a runnable which will perform download
 	 * @return
-	 * @throws OntologyAggregationException
-	 *             thrown if some error occurred during the download
 	 */
 	Runnable getDownloadTask(final OntologyDonwloadHandler handler);
 }

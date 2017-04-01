@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.mindswap.pellet.jena.PelletReasonerFactory;
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadError;
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadTaskFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -44,15 +47,15 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 	 */
 	@Override
 	public void run() {
-		final OntModel baseModel = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
+		final OntModel model = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
 		for (final URL u : ontologyURLs)
 			try {
-				baseModel.read(u.toExternalForm());
+				model.read(u.toExternalForm());
 			} catch (Exception e) {
 				handler.error(new OntologyDownloadError(u, e));
-				baseModel.close();
+				model.close();
 			}
-		handler.complete(baseModel);
+		handler.complete(new JenaQueryEngine(model));
 	}
 
 	/**

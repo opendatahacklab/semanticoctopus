@@ -16,12 +16,10 @@ import java.util.Collection;
 public interface AggregationEngineFactory {
 
 	/**
-	 * Start the aggregation of the specified ontologies. This method
-	 * is expected to return immediately with returning an {@link AggregationEngine}
-	 * in BUILDING state.
+	 * Create an aggregation engine which will aggregate and serve the specified ontologies
 	 * 
 	 * @param ontologyURLs
 	 * @return
 	 */
-	AggregationEngine create(Collection<URL> ontologyURLs) throws OntologyAggregationException;
+	AggregationEngine create(Collection<URL> ontologyURLs);
 }

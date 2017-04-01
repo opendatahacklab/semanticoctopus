@@ -1,29 +1,29 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
 import java.util.concurrent.Executor;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * The initial state of {@link JenaPelletAggregationEngine}, no ontology is available
+ * The initial state of {@link AsyncAggregationEngine}, no ontology is available
  * 
  * @author Cristiano Longo
  *
  */
-public class JenaPelletAggregationEngineIdleState extends JenaPelletAggregationEngineState {
+public class AsyncAggregationEngineIdleState extends AsyncAggregationEngineState {
 
 	/**
 	 * @param stateLabel
 	 */
-	public JenaPelletAggregationEngineIdleState() {
+	public AsyncAggregationEngineIdleState() {
 		super(AggregationEngine.State.IDLE);
 	}
 
@@ -48,17 +48,17 @@ public class JenaPelletAggregationEngineIdleState extends JenaPelletAggregationE
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#build(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadTaskFactory, java.util.concurrent.Executor, org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDonwloadHandler)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState build(final OntologyDownloadTaskFactory downloadTaskFactory,
+	public AsyncAggregationEngineState build(final OntologyDownloadTaskFactory downloadTaskFactory,
 			final Executor downloadExecutor, final OntologyDonwloadHandler handler) {
 		downloadExecutor.execute(downloadTaskFactory.getDownloadTask(handler));
-		return new JenaPelletAggregationEngineBuildingState();
+		return new AsyncAggregationEngineBuildingState();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#complete(com.hp.hpl.jena.ontology.OntModel)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#complete(org.opendatahacklab.semanticoctopus.aggregation.QueryEngine)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState complete(OntModel result) {
+	public AsyncAggregationEngineState complete(final QueryEngine result) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -67,7 +67,7 @@ public class JenaPelletAggregationEngineIdleState extends JenaPelletAggregationE
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#error(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadError)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState error(OntologyDownloadError error) {
+	public AsyncAggregationEngineState error(final OntologyDownloadError error) {
 		// TODO Auto-generated method stub
 		return null;
 	}

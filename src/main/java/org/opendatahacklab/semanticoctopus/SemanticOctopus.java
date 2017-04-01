@@ -12,7 +12,7 @@ import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
 import org.opendatahacklab.semanticoctopus.formatters.ResultSetFormatterProvider;
 import org.opendatahacklab.semanticoctopus.service.FormatterBasedQueryExecutorServiceFactory;
@@ -80,7 +80,7 @@ public class SemanticOctopus {
 	 */
 	private static QueryEngine generateEngine(final String[] args) throws MalformedURLException {
 		final List<URL> ontologies = loadOntologies(args);
-		final QueryEngine engine = new JenaPelletAggregationEngine(ontologies, null, null);
+		final QueryEngine engine = new AsyncAggregationEngine(ontologies, null, null);
 
 		return engine;
 	}

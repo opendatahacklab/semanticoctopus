@@ -1,37 +1,33 @@
 /**
  * 
  */
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.concurrent.Executor;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
 
 /**
- * The initial state of {@link JenaPelletAggregationEngine}, no ontology is available
+ * The initial state of {@link AsyncAggregationEngine}, no ontology is available
  * 
  * @author Cristiano Longo
  *
  */
-public class JenaPelletAggregationEngineReadyState extends JenaPelletAggregationEngineState {
+public class AsyncAggregationEngineReadyState extends AsyncAggregationEngineState {
 
-	private OntModel model;
+	private final QueryEngine delegate;
 
 	/**
-	 * @param model the model which will be served
+	 * @param delegate the model which will be served
 	 */
-	public JenaPelletAggregationEngineReadyState(final OntModel model) {
+	public AsyncAggregationEngineReadyState(final QueryEngine delegate) {
 		super(AggregationEngine.State.READY);
-		this.model=model;
+		this.delegate=delegate;
 	}
 
 	/* (non-Javadoc)
@@ -39,8 +35,7 @@ public class JenaPelletAggregationEngineReadyState extends JenaPelletAggregation
 	 */
 	@Override
 	public ResultSet execQuery(final String query) throws QueryParseException {
-		final QueryExecution execution = QueryExecutionFactory.create(QueryFactory.create(query), model);
-		return execution.execSelect();
+		return delegate.execQuery(query);
 	}
 
 	/* (non-Javadoc)
@@ -48,34 +43,33 @@ public class JenaPelletAggregationEngineReadyState extends JenaPelletAggregation
 	 */
 	@Override
 	public void write(final OutputStream out, final String baseUri) {
-		final OutputStreamWriter writer = new OutputStreamWriter(out);
-		this.model.writeAll(writer, "RDF/XML-ABBREV", baseUri);
+		delegate.write(out, baseUri);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#build(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadTaskFactory, java.util.concurrent.Executor, org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDonwloadHandler)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState build(OntologyDownloadTaskFactory downloadTaskFactory,
+	public AsyncAggregationEngineState build(OntologyDownloadTaskFactory downloadTaskFactory,
 			Executor downloadExecutor, OntologyDonwloadHandler handler) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#complete(com.hp.hpl.jena.ontology.OntModel)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#complete(org.opendatahacklab.semanticoctopus.aggregation.QueryEngine)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState complete(OntModel result) {
+	public AsyncAggregationEngineState complete(final QueryEngine result) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#error(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadError)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#error(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadError)
 	 */
 	@Override
-	public JenaPelletAggregationEngineState error(OntologyDownloadError error) {
+	public AsyncAggregationEngineState error(OntologyDownloadError error) {
 		// TODO Auto-generated method stub
 		return null;
 	}

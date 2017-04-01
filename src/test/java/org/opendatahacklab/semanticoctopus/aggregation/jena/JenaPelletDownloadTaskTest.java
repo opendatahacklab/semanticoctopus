@@ -12,16 +12,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AbstractAggregationTest;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletSeqDownloadTask;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaQueryEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDonwloadHandler;
-import org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadError;
-
-import com.hp.hpl.jena.ontology.OntModel;
+import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
+import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadError;
 
 /**
- * Test cases for the {@link JenaPelletAggregationEngine}
+ * Test cases for the {@link AsyncAggregationEngine}
  * 
  * @author Cristiano Longo
  *
@@ -44,7 +40,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 	 */
 	@Override
 	public QueryEngine createTestSubject(final Collection<URL> ontologies) {
-		final AtomicReference<OntModel> modelReference = new AtomicReference<OntModel>(null);
+		final AtomicReference<QueryEngine> queryReference = new AtomicReference<QueryEngine>(null);
 		final Runnable downloadTask = JenaPelletSeqDownloadTask.createFactory(ontologies)
 				.getDownloadTask(new OntologyDonwloadHandler() {
 
@@ -54,11 +50,11 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 					}
 
 					@Override
-					public void complete(OntModel result) {
-						modelReference.set(result);
+					public void complete(QueryEngine result) {
+						queryReference.set(result);
 					}
 				});
 		downloadTask.run();
-		return new JenaQueryEngine(modelReference.get());
+		return queryReference.get();
 	}
 }

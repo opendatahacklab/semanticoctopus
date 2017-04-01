@@ -1,6 +1,6 @@
-package org.opendatahacklab.semanticoctopus.aggregation.jena;
+package org.opendatahacklab.semanticoctopus.aggregation.async;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
 /**
  * Handle the ontologies download completion and errors
@@ -13,9 +13,9 @@ public interface OntologyDonwloadHandler{
 	/**
 	 * The download complete with no errors.
 	 * 
-	 * @param result the model containing the aggregated ontologies
+	 * @param result a query engine which will provide the aggregated ontologies
 	 */
-	void complete(OntModel result);
+	void complete(QueryEngine result);
 	
 	/**
 	 * Some download failed
