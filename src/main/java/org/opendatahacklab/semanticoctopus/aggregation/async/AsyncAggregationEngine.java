@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
@@ -45,7 +44,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 				}
 
 				@Override
-				public ExecutorService getDownloadExecutor() {
+				public Executor getDownloadExecutor() {
 					return Executors.newSingleThreadExecutor();
 				}
 			});
@@ -81,11 +80,11 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 		 * 
 		 * @return
 		 */
-		ExecutorService getDownloadExecutor();
+		Executor getDownloadExecutor();
 	}
 
 	private final AggregatedQueryEngineFactory queryEngineFactory;
-	private final ExecutorService downloadExecutor;
+	private final Executor downloadExecutor;
 	private final TreeSet<URL> ontologyURLs;
 	private AsyncAggregationEngineState state = null;
 
@@ -144,9 +143,6 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public ResultSet execQuery(final String query) throws QueryParseException {
-		// final QueryExecution execution =
-		// QueryExecutionFactory.create(QueryFactory.create(query), model);
-		// final ResultSet resultSet = execution.execSelect();
 		return state.execQuery(query);
 	}
 
@@ -182,7 +178,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 			}
 			
 			@Override
-			public ExecutorService getDownloadExecutor() {
+			public Executor getDownloadExecutor() {
 				return downloadExecutor;
 			}
 		}, this));
@@ -234,5 +230,13 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	@Override
 	public synchronized void dispose() {
 		throw new UnsupportedOperationException();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#isDisposed()
+	 */
+	@Override
+	public boolean isDisposed() {
+		return false;
 	}
 }

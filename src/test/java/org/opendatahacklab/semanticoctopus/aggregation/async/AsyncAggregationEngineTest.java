@@ -12,14 +12,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 
 import org.junit.Test;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine.State;
+import org.opendatahacklab.semanticoctopus.aggregation.ExplicitExecutor;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine.Parameters;
 
@@ -37,8 +36,14 @@ public class AsyncAggregationEngineTest {
 
 	private static final String QUERY0 = "query0";
 	private static final String QUERY1 = "query1";
+	private static final String QUERY2 = "query2";
 	private static final ResultSet RESULT0 = createDummyResultSet();
 	private static final ResultSet RESULT1 = createDummyResultSet();
+	private static final ResultSet RESULT2 = createDummyResultSet();
+
+	private final FixedQueryEngine ENGINE0 = new FixedQueryEngine(QUERY0, RESULT0);
+	private final FixedQueryEngine ENGINE1 = new FixedQueryEngine(QUERY1, RESULT1);
+	private final FixedQueryEngine ENGINE2 = new FixedQueryEngine(QUERY2, RESULT2);
 
 	/**
 	 * A factory which use a delegate. It starts with a {@link FailingFactory}
@@ -75,11 +80,9 @@ public class AsyncAggregationEngineTest {
 	 */
 	class FailingFactory implements AggregatedQueryEngineFactory {
 
-		private final QueryEngine emptyQueryEngine = new FixedQueryEngine(QUERY0, RESULT0);
-
 		@Override
 		public QueryEngine getEmpty() {
-			return emptyQueryEngine;
+			return ENGINE0;
 		}
 
 		@Override
@@ -89,23 +92,7 @@ public class AsyncAggregationEngineTest {
 		}
 	}
 
-	/**
-	 * A download task which go to sleep when invoked
-	 */
-	private final Runnable blockingDownloadTask = new Runnable() {
-
-		@Override
-		public synchronized void run() {
-			// just blocks
-//			try {
-//				wait();
-//			} catch (InterruptedException e) {
-//				fail(e.getMessage());
-//			}
-		}
-	};
-
-	private final ExecutorService executor;
+	private final ExplicitExecutor executor;
 	private final TestFactory factory;
 	private final AggregationEngine testSubject;
 
@@ -119,7 +106,7 @@ public class AsyncAggregationEngineTest {
 		urls.add(new URL("http://example1.org"));
 		urls.add(new URL("http://example2.org"));
 
-		executor = Executors.newCachedThreadPool();
+		executor = new ExplicitExecutor();
 		factory = new TestFactory();
 		testSubject = new AsyncAggregationEngine(new Parameters() {
 
@@ -134,26 +121,10 @@ public class AsyncAggregationEngineTest {
 			}
 
 			@Override
-			public ExecutorService getDownloadExecutor() {
+			public Executor getDownloadExecutor() {
 				return executor;
 			}
 		});
-	}
-
-	/**
-	 * Ensure that all the tasks submitted to the executor have been performed
-	 */
-	private void ensureAllTasksPerformed() {
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
-		executor.shutdown();
-		try {
-			executor.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		assertTrue(executor.isTerminated());
 	}
 
 	/**
@@ -185,18 +156,23 @@ public class AsyncAggregationEngineTest {
 	 */
 	@Test
 	public void testBuildingInIdleState() throws MalformedURLException {
+		goToBuilding();
+		assertSame(AggregationEngine.State.BUILDING, testSubject.getState());
+		executor.waitForCompletionForceWakeup();
+	}
+	
+	/**
+	 * Go to the building state from IDLE
+	 */
+	private void goToBuilding(){
 		factory.setDelegate(new FailingFactory() {
 			@Override
 			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
-				return blockingDownloadTask;
+				return ExplicitExecutor.BLOCKING;
 			}
 		});
 		testSubject.build();
-		assertSame(AggregationEngine.State.BUILDING, testSubject.getState());
-		// unlock the download thread
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletion();
 	}
 
 	/**
@@ -208,18 +184,9 @@ public class AsyncAggregationEngineTest {
 	 */
 	@Test
 	public void shouldBuildingEngineUseEmptyQueryEngine() throws MalformedURLException {
-		factory.setDelegate(new FailingFactory() {
-			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
-				return blockingDownloadTask;
-			}
-		});
-		testSubject.build();
+		goToBuilding();
 		assertSame(RESULT0, testSubject.execQuery(QUERY0));
-		// unlock the download thread
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletionForceWakeup();
 	}
 
 	/**
@@ -227,20 +194,14 @@ public class AsyncAggregationEngineTest {
 	 */
 	@Test
 	public void shouldBuildingEngineIgnoreBuild() {
-		factory.setDelegate(new FailingFactory() {
-			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
-				return blockingDownloadTask;
-			}
-		});
-		testSubject.build();
+		goToBuilding();
 		factory.setDelegate(new FailingFactory());
 		testSubject.build();
 		assertSame(State.BUILDING, testSubject.getState());
-		// unlock the download thread
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletion();
+		assertSame(State.BUILDING, testSubject.getState());
+		executor.waitForCompletionForceWakeup();
+		assertSame(State.BUILDING, testSubject.getState());
 	}
 
 	/**
@@ -251,7 +212,6 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void testCompleteInBuildingState() throws MalformedURLException {
 		gotToReady();
-		ensureAllTasksPerformed();
 		assertSame(AggregationEngine.State.READY, testSubject.getState());
 	}
 
@@ -259,7 +219,6 @@ public class AsyncAggregationEngineTest {
 	 * Move the engine to the ready state from IDLE
 	 */
 	private void gotToReady() {
-		final QueryEngine aggregatedQueryEngine = new FixedQueryEngine(QUERY1, RESULT1);
 		factory.setDelegate(new FailingFactory() {
 			@Override
 			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
@@ -267,12 +226,14 @@ public class AsyncAggregationEngineTest {
 
 					@Override
 					public void run() {
-						handler.complete(aggregatedQueryEngine);
+						handler.complete(ENGINE1);
 					}
 				};
 			}
 		});
 		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());
 	}
 
 	/**
@@ -283,7 +244,18 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void shouldReadyEngineUseTheNovelQueryEngine() throws MalformedURLException {
 		gotToReady();
-		ensureAllTasksPerformed();
+		assertSame(RESULT1, testSubject.execQuery(QUERY1));
+	}
+
+	/**
+	 * Test that the previous engine has been disposed after a succesful build
+	 * 
+	 * @throws MalformedURLException
+	 */
+	@Test
+	public void shouldOldEngineDisposedInReadyState() throws MalformedURLException {
+		gotToReady();
+		assertTrue(ENGINE0.isDisposed());
 		assertSame(RESULT1, testSubject.execQuery(QUERY1));
 	}
 
@@ -295,7 +267,6 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void testErrorInBuildingState() throws MalformedURLException {
 		goToError();
-		ensureAllTasksPerformed();
 		assertSame(AggregationEngine.State.ERROR, testSubject.getState());
 	}
 
@@ -319,6 +290,8 @@ public class AsyncAggregationEngineTest {
 			}
 		});
 		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());
 	}
 
 	/**
@@ -329,7 +302,6 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void shouldErrorEngineUseTheEmptyQueryEngine() throws MalformedURLException {
 		goToError();
-		ensureAllTasksPerformed();
 		assertSame(RESULT0, testSubject.execQuery(QUERY0));
 	}
 
@@ -339,8 +311,9 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void testBuildInReadyState() {
 		goToBuildingAfterReady();
-		ensureAllTasksPerformed();
 		assertSame(AggregationEngine.State.BUILDING, testSubject.getState());
+		executor.waitForCompletionForceWakeup();
+		assertTrue(executor.isEmpty());
 	}
 
 	/**
@@ -351,10 +324,11 @@ public class AsyncAggregationEngineTest {
 		factory.setDelegate(new FailingFactory() {
 			@Override
 			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
-				return blockingDownloadTask;
+				return ExplicitExecutor.BLOCKING;
 			}
 		});
 		testSubject.build();
+		executor.waitForCompletion();
 	}
 
 	/**
@@ -363,11 +337,9 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void shouldPreviousQueryEngineUsedDuringRebuildAfterReady() {
 		goToBuildingAfterReady();
-		ensureAllTasksPerformed();
 		assertSame(RESULT1, testSubject.execQuery(QUERY1));
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletionForceWakeup();
+		assertTrue(executor.isEmpty());
 	}
 
 	/**
@@ -377,11 +349,9 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void testBuildInErrorState() throws MalformedURLException {
 		goToBuildingAfterError();
-		ensureAllTasksPerformed();
 		assertSame(AggregationEngine.State.BUILDING, testSubject.getState());
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletionForceWakeup();
+		assertTrue(executor.isEmpty());
 	}
 
 	/**
@@ -394,10 +364,11 @@ public class AsyncAggregationEngineTest {
 		factory.setDelegate(new FailingFactory() {
 			@Override
 			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
-				return blockingDownloadTask;
+				return ExplicitExecutor.BLOCKING;
 			}
 		});
 		testSubject.build();
+		executor.waitForCompletion();
 	}
 
 	/**
@@ -409,11 +380,156 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void shouldErrorEngineUseTheEmptyQueryEngineDuringRebuild() throws MalformedURLException {
 		goToBuildingAfterError();
-		ensureAllTasksPerformed();
 		assertSame(RESULT0, testSubject.execQuery(QUERY0));
-		synchronized (blockingDownloadTask) {
-			blockingDownloadTask.notifyAll();
-		}
+		executor.waitForCompletionForceWakeup();
+		assertTrue(executor.isEmpty());
+	}
+	
+	/** 
+	 * Test rebuild after a successful build
+	 */
+	@Test
+	public void testSuccesfulRebuild(){
+		goToRebuild();
+		assertSame(State.READY, testSubject.getState());
+	}
+
+	/**
+	 * Two succesful builds happened
+	 */
+	private void goToRebuild(){
+		gotToReady();
+		factory.setDelegate(new FailingFactory() {
+			@Override
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+				return new Runnable() {
+
+					@Override
+					public void run() {
+						handler.complete(ENGINE2);
+					}
+				};
+			}
+		});
+		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());		
+	}
+
+	/** 
+	 * 
+	 */
+	@Test
+	public void shouldNovelEngineUsedAfterSuccesfulRebuild(){
+		goToRebuild();
+		assertSame(RESULT2, testSubject.execQuery(QUERY2));
+	}
+
+	/** 
+	 * 
+	 */
+	@Test
+	public void shouldOldEngineDisposedAfterSuccesfulRebuild(){
+		goToRebuild();
+		assertTrue(ENGINE1.isDisposed());
+		assertSame(RESULT2, testSubject.execQuery(QUERY2));
+	}
+
+	/** 
+	 * Test rebuild after a successful build
+	 * @throws MalformedURLException 
+	 */
+	@Test
+	public void testSuccesfulRebuildAfterError() throws MalformedURLException{
+		goToRebuildAfterError();
+		assertSame(State.READY, testSubject.getState());
+	}
+
+	/**
+	 * A succesful rebuild after error
+	 * @throws MalformedURLException 
+	 */
+	private void goToRebuildAfterError() throws MalformedURLException{
+		goToError();
+		factory.setDelegate(new FailingFactory() {
+			@Override
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+				return new Runnable() {
+
+					@Override
+					public void run() {
+						handler.complete(ENGINE1);
+					}
+				};
+			}
+		});
+		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());		
+	}
+
+	/**
+	 * @throws MalformedURLException  
+	 * 
+	 */
+	@Test
+	public void shouldNovelEngineUsedAfterSuccesfulRebuildAfterError() throws MalformedURLException{
+		goToRebuildAfterError();
+		assertSame(RESULT1, testSubject.execQuery(QUERY1));
+	}
+
+	/**
+	 * @throws MalformedURLException  
+	 * 
+	 */
+	@Test
+	public void shouldOldEngineDisposedAfterSuccesfulRebuildAfterError() throws MalformedURLException{
+		goToRebuildAfterError();
+		assertTrue(ENGINE0.isDisposed());
+	}
+
+	/** 
+	 * Test rebuild after a successful build
+	 * @throws MalformedURLException 
+	 */
+	@Test
+	public void testFailingRebuild() throws MalformedURLException{
+		goToFailingRebuildAfterReady();
+		assertSame(State.ERROR, testSubject.getState());
+	}
+
+	/**
+	 * A build fails in error state
+	 * @throws MalformedURLException 
+	 */
+	private void goToFailingRebuildAfterReady() throws MalformedURLException{
+		gotToReady();
+		final OntologyDownloadError error = new OntologyDownloadError(new URL("http://error.org"), "error");
+		factory.setDelegate(new FailingFactory() {
+			@Override
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+				return new Runnable() {
+
+					@Override
+					public void run() {
+						handler.error(error);
+					}
+				};
+			}
+		});
+		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());		
+	}
+
+	/**
+	 * @throws MalformedURLException  
+	 * 
+	 */
+	@Test
+	public void shouldPreviousEngineUsedAfterFailingRebuild() throws MalformedURLException{
+		goToFailingRebuildAfterReady();
+		assertSame(RESULT1, testSubject.execQuery(QUERY1));
 	}
 
 	/**

@@ -34,4 +34,9 @@ public interface QueryEngine {
 	 * Free all resources
 	 */
 	void dispose();
+	
+	/**
+	 * @return
+	 */
+	boolean isDisposed();
 }

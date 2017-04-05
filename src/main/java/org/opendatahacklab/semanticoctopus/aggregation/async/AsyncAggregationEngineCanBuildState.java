@@ -36,7 +36,7 @@ public class AsyncAggregationEngineCanBuildState extends AsyncAggregationEngineS
 	public final AsyncAggregationEngineState build(final Parameters parameters, final OntologyDonwloadHandler handler) {
 		final Runnable downloadTask = parameters.getQueryEngineFactory().getDownloadTask(parameters.getOntologies(),
 				handler);
-		parameters.getDownloadExecutor().submit(downloadTask);
+		parameters.getDownloadExecutor().execute(downloadTask);
 		return new AsyncAggregationEngineBuildingState(getDelegate());
 	}
 }

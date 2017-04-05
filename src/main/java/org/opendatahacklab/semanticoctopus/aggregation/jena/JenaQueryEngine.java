@@ -55,4 +55,12 @@ public class JenaQueryEngine implements QueryEngine{
 		model.close();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#isDisposed()
+	 */
+	@Override
+	public boolean isDisposed() {
+		return model.isClosed();
+	}
+
 }

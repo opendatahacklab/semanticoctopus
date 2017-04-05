@@ -68,5 +68,13 @@ public class FixedQueryEngine implements QueryEngine {
 	public void dispose() {
 		disposed=true;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#isDisposed()
+	 */
+	@Override
+	public boolean isDisposed(){
+		return disposed;
+	}
 
 }

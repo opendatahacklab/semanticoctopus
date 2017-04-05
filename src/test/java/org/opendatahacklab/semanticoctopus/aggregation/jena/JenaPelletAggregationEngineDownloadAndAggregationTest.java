@@ -4,18 +4,16 @@
 package org.opendatahacklab.semanticoctopus.aggregation.jena;
 
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AbstractAggregationTest;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.ExplicitExecutor;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine.Parameters;
@@ -44,7 +42,7 @@ public class JenaPelletAggregationEngineDownloadAndAggregationTest extends Abstr
 	 */
 	@Override
 	public QueryEngine createTestSubject(final Collection<URL> ontologies) throws InterruptedException {
-		final ExecutorService executor = Executors.newCachedThreadPool();
+		final ExplicitExecutor executor = new ExplicitExecutor();
 		final AggregationEngine engine = new AsyncAggregationEngine(new Parameters() {
 			
 			@Override
@@ -58,15 +56,13 @@ public class JenaPelletAggregationEngineDownloadAndAggregationTest extends Abstr
 			}
 			
 			@Override
-			public ExecutorService getDownloadExecutor() {
+			public Executor getDownloadExecutor() {
 				return executor;
 			}
 		});
 		assertSame(AggregationEngine.State.IDLE, engine.getState());
 		engine.build();
-		executor.shutdown();
-		executor.awaitTermination(20, TimeUnit.SECONDS);
-		assertTrue(executor.isTerminated());
+		executor.waitForCompletion();
 		assertSame(AggregationEngine.State.READY, engine.getState());
 		return engine;
 	}
