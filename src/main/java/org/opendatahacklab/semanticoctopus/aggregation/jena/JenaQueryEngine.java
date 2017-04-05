@@ -47,4 +47,12 @@ public class JenaQueryEngine implements QueryEngine{
 		return execution.execSelect();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#dispose()
+	 */
+	@Override
+	public void dispose() {
+		model.close();
+	}
+
 }

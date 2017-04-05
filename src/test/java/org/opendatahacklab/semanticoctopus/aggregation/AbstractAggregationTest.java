@@ -102,8 +102,11 @@ public abstract class AbstractAggregationTest {
 			final RelativePair expectedPair = expectedIt.next();
 			assertTrue("Too less pairs returned rows=" + n, actual.hasNext());
 			final QuerySolution actualPair = actual.next();
-			assertEquals("row=" + n, expectedPair.x, actualPair.get("x").asResource().getURI());
-			assertEquals("row=" + n, expectedPair.y, actualPair.get("y").asResource().getURI());
+			final String actualx = actualPair.get("x").asResource().getURI();
+			final String actualy = actualPair.get("y").asResource().getURI();			
+			System.out.println("Expected (x="+expectedPair.x+",y="+expectedPair.y+"); Actual (x="+actualx+",y="+actualy+")");
+			assertEquals("row=" + n, expectedPair.x, actualx);
+			assertEquals("row=" + n, expectedPair.y, actualy);
 		}
 		assertFalse("Too much pairs returned. Rows=" + n, actual.hasNext());
 	}

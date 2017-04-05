@@ -3,10 +3,8 @@
  */
 package org.opendatahacklab.semanticoctopus.aggregation.async;
 
-import java.util.concurrent.Executor;
-
-import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine.State;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 
 /**
@@ -26,20 +24,12 @@ class AsyncAggregationEngineBuildingState extends AsyncAggregationEngineState {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletAggregationEngineState#build(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadTaskFactory, java.util.concurrent.Executor, org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDonwloadHandler)
-	 */
-	@Override
-	public AsyncAggregationEngineState build(final AggregatedQueryEngineFactory downloadTaskFactory,
-			final Executor downloadExecutor, final OntologyDonwloadHandler handler) {
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#complete(org.opendatahacklab.semanticoctopus.aggregation.QueryEngine)
 	 */
 	@Override
 	public AsyncAggregationEngineState complete(final QueryEngine result) {
-		return new AsyncAggregationEngineReadyState(result);
+		getDelegate().dispose();
+		return new AsyncAggregationEngineCanBuildState(State.READY, result);
 	}
 
 	/* (non-Javadoc)
@@ -47,6 +37,6 @@ class AsyncAggregationEngineBuildingState extends AsyncAggregationEngineState {
 	 */
 	@Override
 	public AsyncAggregationEngineState error(final OntologyDownloadError error) {
-		return new AsyncAggregationEngineErrorState(getDelegate());
+		return new AsyncAggregationEngineCanBuildState(State.ERROR, getDelegate());
 	}
 }

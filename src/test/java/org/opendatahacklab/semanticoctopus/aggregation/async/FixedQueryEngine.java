@@ -26,6 +26,7 @@ public class FixedQueryEngine implements QueryEngine {
 	private final ResultSet resultSet;
 	
 	private boolean called;
+	private boolean disposed;
 
 	/**
 	 * 
@@ -52,10 +53,20 @@ public class FixedQueryEngine implements QueryEngine {
 	 */
 	@Override
 	public ResultSet execQuery(String query) throws QueryParseException {
+		if (disposed)
+			throw new IllegalStateException();
 		assertEquals(expectedQuery, query);
 		assertFalse("Multiple calls to execQuery", called);
 		called=false;
 		return resultSet;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#dispose()
+	 */
+	@Override
+	public void dispose() {
+		disposed=true;
 	}
 
 }

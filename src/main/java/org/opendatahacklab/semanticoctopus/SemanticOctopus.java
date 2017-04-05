@@ -22,24 +22,24 @@ import org.opendatahacklab.semanticoctopus.service.Version;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * Aggregates ontologies specified as parameters and starts server for querying against resulting ontology
+ * Aggregates ontologies specified as parameters and starts server for querying
+ * against resulting ontology
  * 
  * @author Cristiano Longo, OOL
  */
 public class SemanticOctopus {
 
 	/**
-	 * Aggregate the ontologies passed as command line parameters. The resulting ontology is sent on the standard
-	 * output.
+	 * Aggregate the ontologies passed as command line parameters. The resulting
+	 * ontology is sent on the standard output.
 	 * 
 	 * @param args
 	 * @throws MalformedURLException
 	 */
 	public static void main(final String[] args) throws MalformedURLException {
 		if (args.length < 3) {
-			System.err.println(
-					"Usage: java -jar semanticoctopus-" + Version.VERSION
-							+ " <host> <port> <ontologyURL1> [ontologyURL2 [ontologyURL3 ...]]");
+			System.err.println("Usage: java -jar semanticoctopus-" + Version.VERSION
+					+ " <host> <port> <ontologyURL1> [ontologyURL2 [ontologyURL3 ...]]");
 			System.exit(1);
 		}
 
@@ -80,7 +80,7 @@ public class SemanticOctopus {
 	 */
 	private static QueryEngine generateEngine(final String[] args) throws MalformedURLException {
 		final List<URL> ontologies = loadOntologies(args);
-		final QueryEngine engine = new AsyncAggregationEngine(ontologies, null, null);
+		final QueryEngine engine = AsyncAggregationEngine.FACTORY.create(ontologies);
 
 		return engine;
 	}
@@ -100,7 +100,8 @@ public class SemanticOctopus {
 	}
 
 	/**
-	 * Prepares base URI, then opens and starts server with specified aggregator and formatter
+	 * Prepares base URI, then opens and starts server with specified aggregator
+	 * and formatter
 	 *
 	 * @param executor
 	 *
@@ -115,8 +116,8 @@ public class SemanticOctopus {
 		config.register(LoggingFeature.class);
 		config.registerInstances(executor);
 		final HttpServer server = JdkHttpServerFactory.createHttpServer(baseUri, config);
-		System.out.println("Server started at "+baseUri);
-		
+		System.out.println("Server started at " + baseUri);
+
 		return server;
 	}
 }

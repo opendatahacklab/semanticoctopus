@@ -44,19 +44,5 @@ public interface AggregationEngine extends QueryEngine{
 	 * 
 	 * @return
 	 */
-	State getState();
-	
-	/**
-	 * Attach a listener which will receive events about state changes
-	 * 
-	 * @param listener
-	 */
-	void attach(AggregationEngineListener listener);
-
-	/**
-	 * Detach a listener, if attached.
-	 * 
-	 * @param listener
-	 */
-	void detach(AggregationEngineListener listener);
+	State getState();	
 }

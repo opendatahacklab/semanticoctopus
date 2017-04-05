@@ -2,12 +2,17 @@ package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.TreeSet;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
-import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngineListener;
+import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.jena.JenaPelletQueryEngineFactory;
 
@@ -23,42 +28,102 @@ import com.hp.hpl.jena.query.ResultSet;
  */
 public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwloadHandler {
 
-	private final AggregatedQueryEngineFactory downloadTaskFactory;
-	private final Executor downloadExecutor;
+	public static final AggregationEngineFactory FACTORY = new AggregationEngineFactory() {
+
+		@Override
+		public AggregationEngine create(final Collection<URL> ontologyURLs) {
+			return new AsyncAggregationEngine(new Parameters() {
+
+				@Override
+				public AggregatedQueryEngineFactory getQueryEngineFactory() {
+					return new JenaPelletQueryEngineFactory();
+				}
+
+				@Override
+				public Collection<URL> getOntologies() {
+					return ontologyURLs;
+				}
+
+				@Override
+				public ExecutorService getDownloadExecutor() {
+					return Executors.newSingleThreadExecutor();
+				}
+			});
+		}
+	};
+
+	/**
+	 * Construction parameters
+	 * 
+	 * @author Cristiano Longo
+	 *
+	 */
+	public interface Parameters {
+
+		/**
+		 * Get the set of ontologies which contributed to create the underlying
+		 * knowledge base.
+		 * 
+		 * @return
+		 */
+		Collection<URL> getOntologies();
+
+		/**
+		 * The factory to get query engine delegates.
+		 * 
+		 * @return
+		 */
+		AggregatedQueryEngineFactory getQueryEngineFactory();
+
+		/**
+		 * Get the executor which will be used to run the ontologies download
+		 * and aggregation tasks.
+		 * 
+		 * @return
+		 */
+		ExecutorService getDownloadExecutor();
+	}
+
+	private final AggregatedQueryEngineFactory queryEngineFactory;
+	private final ExecutorService downloadExecutor;
+	private final TreeSet<URL> ontologyURLs;
 	private AsyncAggregationEngineState state = null;
+
 
 	/**
 	 * Create an aggregation engine which will use the specified download task
 	 * factory to generate the model.
 	 * 
-	 * @param downloadTaskFactory
+	 * @param ontologyURLs
+	 *            the ontologies to be aggregated
+	 * @param queryEngineFactory
 	 *            a delegate for ontology downloads
 	 * @param donwloadExecutor
 	 *            the {@link Executor} which will be used to perform the
 	 *            download task. It is expected to run in another thread.
 	 */
-	public AsyncAggregationEngine(final AggregatedQueryEngineFactory downloadTaskFactory,
-			Executor donwloadExecutor) {
-		this.downloadTaskFactory = downloadTaskFactory;
-		this.downloadExecutor=donwloadExecutor;
-		state = new AsyncAggregationEngineIdleState(downloadTaskFactory.getEmpty());
+	public AsyncAggregationEngine(final Parameters parameters) {
+		this.queryEngineFactory = parameters.getQueryEngineFactory();
+		this.downloadExecutor = parameters.getDownloadExecutor();
+		this.ontologyURLs = new TreeSet<URL>(new Comparator<URL>() {
+
+			@Override
+			public int compare(final URL o1, final URL o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		this.ontologyURLs.addAll(ontologyURLs);
+		setState(new AsyncAggregationEngineCanBuildState(State.IDLE, queryEngineFactory.getEmpty()));
 	}
 
 	/**
-	 * Get an aggregation engine which will use the default implementation of
-	 * download task factory
-	 * 
-	 * @param ontologyURLs
-	 *            the ontologies to be aggregated
-	 * @param donwloadExecutor
-	 *            the {@link Executor} which will be used to perform the
-	 *            download task. It is expected to run in another thread.
+	 * Change the current state
+	 * @param newState
 	 */
-	public AsyncAggregationEngine(final Collection<URL> ontologyURLs, final AggregatedQueryEngineFactory downloader,
-			Executor donwloadExecutor) {
-		this(new JenaPelletQueryEngineFactory(ontologyURLs), donwloadExecutor);
+	private void setState(AsyncAggregationEngineState newState){
+		this.state=newState;
+		System.out.println("Current state "+state.getStateLabel());
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -93,7 +158,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public Collection<URL> getOntologies() {
-		return downloadTaskFactory.getOntologies();
+		return new ArrayList<>(ontologyURLs);
 	}
 
 	/*
@@ -104,9 +169,23 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public synchronized void build() {
-		final AsyncAggregationEngineState destState = state.build(downloadTaskFactory, downloadExecutor, this);
-		// TODO notify listeners
-		state = destState;
+		setState(state.build(new Parameters() {
+			
+			@Override
+			public AggregatedQueryEngineFactory getQueryEngineFactory() {
+				return queryEngineFactory;
+			}
+			
+			@Override
+			public Collection<URL> getOntologies() {
+				return ontologyURLs;
+			}
+			
+			@Override
+			public ExecutorService getDownloadExecutor() {
+				return downloadExecutor;
+			}
+		}, this));
 	}
 
 	/*
@@ -120,18 +199,6 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 		return state.getStateLabel();
 	}
 
-	@Override
-	public void attach(AggregationEngineListener listener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void detach(AggregationEngineListener listener) {
-		// TODO Auto-generated method stub
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -141,8 +208,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	@Override
 	public synchronized void complete(final QueryEngine result) {
 		final AsyncAggregationEngineState newState = state.complete(result);
-		// TODO notify listeners
-		state = newState;
+		setState(newState);
 	}
 
 	/*
@@ -157,5 +223,16 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 		final AsyncAggregationEngineState newState = state.error(error);
 		// TODO notify listeners
 		state = newState;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#dispose()
+	 */
+	@Override
+	public synchronized void dispose() {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -4,11 +4,10 @@
 package org.opendatahacklab.semanticoctopus.aggregation.async;
 
 import java.io.OutputStream;
-import java.util.concurrent.Executor;
 
-import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
+import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine.Parameters;
 
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
@@ -25,14 +24,10 @@ abstract class AsyncAggregationEngineState {
 	private final QueryEngine delegate;
 
 	/**
-	 * @param delegate TODO
-	 * 
-	 */
-	/**
 	 * @param stateLabel
 	 * @param delegate the delegate used to perform queries
 	 */
-	public AsyncAggregationEngineState(final AggregationEngine.State stateLabel, QueryEngine delegate) {
+	public AsyncAggregationEngineState(final AggregationEngine.State stateLabel, final QueryEngine delegate) {
 		this.stateLabel = stateLabel;
 		this.delegate=delegate;
 	}
@@ -66,27 +61,40 @@ abstract class AsyncAggregationEngineState {
 	}
 
 	/**
-	 * @param downloadExecutor TODO
-	 * @return the destination state
+	 * In the default implementation the event is just ignored. 
+	 * 
+	 * @param parameters
+	 * @param handler
+	 * @return
 	 */
-	public abstract AsyncAggregationEngineState build(final AggregatedQueryEngineFactory downloadTaskFactory,
-			final Executor downloadExecutor, final OntologyDonwloadHandler handler);
+	public AsyncAggregationEngineState build(final Parameters parameters,
+			final OntologyDonwloadHandler handler){
+		return this;
+	}
 
 	/**
+	 * In the default implementation the event is just ignored. 
+	 * 
 	 * Handle the download complete event
 	 * 
 	 * @param result
 	 * @return the destination state
 	 */
-	public abstract AsyncAggregationEngineState complete(QueryEngine result);
+	public AsyncAggregationEngineState complete(QueryEngine result){
+		return this;
+	}
 
 	/**
+ 	 * In the default implementation the event is just ignored. 
+ 	 * 
 	 * Handle the download error event
 	 * 
 	 * @param error
 	 * @return the destination state
 	 */
-	public abstract AsyncAggregationEngineState error(OntologyDownloadError error);
+	public AsyncAggregationEngineState error(OntologyDownloadError error){
+		return this;
+	}
 
 	/**
 	 * Get the delegate query engine actually in use

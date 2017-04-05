@@ -29,4 +29,9 @@ public interface QueryEngine {
 	 * @throws QueryParseException
 	 */
 	ResultSet execQuery(String query) throws QueryParseException;
+	
+	/**
+	 * Free all resources
+	 */
+	void dispose();
 }
