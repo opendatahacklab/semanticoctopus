@@ -36,7 +36,7 @@ class AsyncAggregationEngineBuildingState extends AsyncAggregationEngineState {
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#error(org.opendatahacklab.semanticoctopus.aggregation.jena.OntologyDownloadError)
 	 */
 	@Override
-	public AsyncAggregationEngineState error(final OntologyDownloadError error) {
+	public AsyncAggregationEngineState error() {
 		return new AsyncAggregationEngineCanBuildState(State.ERROR, getDelegate());
 	}
 }

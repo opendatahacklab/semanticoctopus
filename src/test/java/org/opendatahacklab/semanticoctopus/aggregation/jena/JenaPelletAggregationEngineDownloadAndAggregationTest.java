@@ -41,7 +41,7 @@ public class JenaPelletAggregationEngineDownloadAndAggregationTest extends Abstr
 	 * createTestSubject(java.util.Collection)
 	 */
 	@Override
-	public QueryEngine createTestSubject(final Collection<URL> ontologies) throws InterruptedException {
+	public QueryEngine createSuccesTestSubject(final Collection<URL> ontologies) throws InterruptedException {
 		final ExplicitExecutor executor = new ExplicitExecutor();
 		final AggregationEngine engine = new AsyncAggregationEngine(new Parameters() {
 			

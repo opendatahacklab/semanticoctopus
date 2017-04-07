@@ -3,7 +3,6 @@
  */
 package org.opendatahacklab.semanticoctopus.aggregation.async;
 
-import java.net.URI;
 import java.net.URL;
 
 /**
@@ -14,6 +13,10 @@ import java.net.URL;
  */
 public class OntologyDownloadError extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 52510115414711696L;
 	private final URL ontologyURL;
 	
 	/**

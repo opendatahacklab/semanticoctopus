@@ -89,10 +89,9 @@ abstract class AsyncAggregationEngineState {
  	 * 
 	 * Handle the download error event
 	 * 
-	 * @param error
 	 * @return the destination state
 	 */
-	public AsyncAggregationEngineState error(OntologyDownloadError error){
+	public AsyncAggregationEngineState error(){
 		return this;
 	}
 

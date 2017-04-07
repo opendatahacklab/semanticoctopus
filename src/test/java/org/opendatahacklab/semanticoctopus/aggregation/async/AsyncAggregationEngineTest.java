@@ -271,6 +271,17 @@ public class AsyncAggregationEngineTest {
 	}
 
 	/**
+	 * Test receiving an error notification in BUILDING state
+	 * 
+	 * @throws MalformedURLException
+	 */
+	@Test
+	public void testInconsistentOntologyInBuildingState() throws MalformedURLException {
+		goToErrorInconsistentOntology();
+		assertSame(AggregationEngine.State.ERROR, testSubject.getState());
+	}
+
+	/**
 	 * Take the engine in error state after the first build request
 	 * 
 	 * @throws MalformedURLException
@@ -295,6 +306,29 @@ public class AsyncAggregationEngineTest {
 	}
 
 	/**
+	 * Take the engine in error state after the first build request because of an Inconsistent Ontology
+	 * 
+	 * @throws MalformedURLException
+	 */
+	private void goToErrorInconsistentOntology(){
+		factory.setDelegate(new FailingFactory() {
+			@Override
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+				return new Runnable() {
+
+					@Override
+					public void run() {
+						handler.error(new InconsistenOntologyException());
+					}
+				};
+			}
+		});
+		testSubject.build();
+		executor.waitForCompletion();
+		assertTrue(executor.isEmpty());
+	}
+
+	/**
 	 * Test that if the first build fails, the empty query engine is still used
 	 * 
 	 * @throws MalformedURLException
@@ -302,6 +336,17 @@ public class AsyncAggregationEngineTest {
 	@Test
 	public void shouldErrorEngineUseTheEmptyQueryEngine() throws MalformedURLException {
 		goToError();
+		assertSame(RESULT0, testSubject.execQuery(QUERY0));
+	}
+
+	/**
+	 * Test that if the first build fails, the empty query engine is still used
+	 * 
+	 * @throws MalformedURLException
+	 */
+	@Test
+	public void shouldInconsistentOntologyEngineUseTheEmptyQueryEngine() throws MalformedURLException {
+		goToErrorInconsistentOntology();
 		assertSame(RESULT0, testSubject.execQuery(QUERY0));
 	}
 

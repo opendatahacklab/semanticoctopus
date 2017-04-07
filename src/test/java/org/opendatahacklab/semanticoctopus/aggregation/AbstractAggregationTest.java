@@ -52,12 +52,14 @@ public abstract class AbstractAggregationTest {
 		}
 	}
 
-	private final URL vocabulary;
-	private final URL ontologyA;
-	private final URL ontologyB;
-	private final URL ontologyC;
-	private final URL ontologySubclass;
-	private final URL ontologySubproperty;
+	protected final URL vocabulary;
+	protected final URL ontologyA;
+	protected final URL ontologyB;
+	protected final URL ontologyC;
+	protected final URL ontologySubclass;
+	protected final URL ontologySubproperty;
+	protected final URL inconsistentOntology;
+	protected final URL noSuchOntology;
 	private final String individualA;
 	private final String individualB;
 	private final String individualC;
@@ -74,6 +76,8 @@ public abstract class AbstractAggregationTest {
 		ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
 		ontologySubclass = new URL("http://opendatahacklab.org/semanticoctopus/testbed/subclass.owl");
 		ontologySubproperty = new URL("http://opendatahacklab.org/semanticoctopus/testbed/subproperty.owl");
+		inconsistentOntology = new URL("http://opendatahacklab.org/semanticoctopus/testbed/inconsistent.owl");
+		noSuchOntology = new URL("http://opendatahacklab.org/semanticoctopus/testbed/nosuchontology.owl");
 		individualA = "http://opendatahacklab.org/semanticoctopus/testbed/a";
 		individualB = "http://opendatahacklab.org/semanticoctopus/testbed/b";
 		individualC = "http://opendatahacklab.org/semanticoctopus/testbed/c";
@@ -92,7 +96,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	private void testRelatives(final Collection<URL> ontologies, final List<RelativePair> expected)
 			throws InterruptedException {
-		final QueryEngine engine = createTestSubject(ontologies);
+		final QueryEngine engine = createSuccesTestSubject(ontologies);
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
 		final Iterator<RelativePair> expectedIt = expected.iterator();
@@ -119,7 +123,7 @@ public abstract class AbstractAggregationTest {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public abstract QueryEngine createTestSubject(final Collection<URL> ontologies) throws InterruptedException;
+	public abstract QueryEngine createSuccesTestSubject(final Collection<URL> ontologies) throws InterruptedException;
 
 	/**
 	 * Convenience method
@@ -274,7 +278,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferMemberOfSuperclasses() throws InterruptedException {
-		final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubclass));
+		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -290,7 +294,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() throws InterruptedException {
-		final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubproperty));
+		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
@@ -309,7 +313,7 @@ public abstract class AbstractAggregationTest {
 	@Test
 	public void shouldThrowAnExceptionOnInvalidQuery() throws InterruptedException {
 		try {
-			final QueryEngine engine = createTestSubject(Collections.singletonList(ontologySubproperty));
+			final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubproperty));
 			engine.execQuery("An invalid query string");
 			fail("expected exception not thrown");
 		} catch (final QueryParseException e) {

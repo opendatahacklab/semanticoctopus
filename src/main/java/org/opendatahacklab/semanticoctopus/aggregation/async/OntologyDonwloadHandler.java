@@ -23,5 +23,11 @@ public interface OntologyDonwloadHandler{
 	 * @param error
 	 */
 	void error(OntologyDownloadError error);
-	
+
+	/**
+	 * The aggregated ontology is not consistent
+	 * 
+	 * @param error
+	 */
+	void error(InconsistenOntologyException error);
 }

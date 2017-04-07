@@ -111,7 +111,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
-		this.ontologyURLs.addAll(ontologyURLs);
+		this.ontologyURLs.addAll(parameters.getOntologies());
 		setState(new AsyncAggregationEngineCanBuildState(State.IDLE, queryEngineFactory.getEmpty()));
 	}
 
@@ -216,8 +216,16 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public synchronized void error(OntologyDownloadError error) {
-		final AsyncAggregationEngineState newState = state.error(error);
-		// TODO notify listeners
+		final AsyncAggregationEngineState newState = state.error();
+		state = newState;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler#error(org.opendatahacklab.semanticoctopus.aggregation.async.InconsistenOntologyException)
+	 */
+	@Override
+	public synchronized void error(InconsistenOntologyException error) {
+		final AsyncAggregationEngineState newState = state.error();
 		state = newState;
 	}
 
@@ -239,4 +247,5 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	public boolean isDisposed() {
 		return false;
 	}
+
 }

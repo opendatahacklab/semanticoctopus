@@ -7,11 +7,13 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.mindswap.pellet.jena.PelletReasonerFactory;
+import org.opendatahacklab.semanticoctopus.aggregation.async.InconsistenOntologyException;
 import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
 import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDownloadError;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.reasoner.ValidityReport;
 
 /**
  * Perform a download using Jena for the model and Pellet for reasoning.
@@ -48,9 +50,16 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 			try {
 				model.read(u.toExternalForm());
 			} catch (Exception e) {
-				handler.error(new OntologyDownloadError(u, e));
 				model.close();
+				handler.error(new OntologyDownloadError(u, e));
+				return;
 			}
-		handler.complete(new JenaQueryEngine(model));
+		final ValidityReport report = model.validate();
+		if (report.isValid())
+			handler.complete(new JenaQueryEngine(model));
+		else {
+			model.close();
+			handler.error(new InconsistenOntologyException());
+		}
 	}
 }
