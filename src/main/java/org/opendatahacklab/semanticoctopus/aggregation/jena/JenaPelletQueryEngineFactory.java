@@ -6,6 +6,7 @@ package org.opendatahacklab.semanticoctopus.aggregation.jena;
 import java.net.URL;
 import java.util.Collection;
 
+import org.opendatahacklab.semanticoctopus.OutputConsole;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.OntologyDonwloadHandler;
@@ -42,8 +43,9 @@ public class JenaPelletQueryEngineFactory implements AggregatedQueryEngineFactor
 	 * semanticoctopus.aggregation.async.OntologyDonwloadHandler)
 	 */
 	@Override
-	public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
-		return new JenaPelletSeqDownloadTask(ontologyURLs, handler);
+	public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler,
+			final OutputConsole out) {
+		return new JenaPelletSeqDownloadTask(ontologyURLs, handler, out);
 	}
 
 }

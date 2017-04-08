@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.opendatahacklab.semanticoctopus.OutputConsole;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngineFactory;
@@ -30,7 +31,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	public static final AggregationEngineFactory FACTORY = new AggregationEngineFactory() {
 
 		@Override
-		public AggregationEngine create(final Collection<URL> ontologyURLs) {
+		public AggregationEngine create(final Collection<URL> ontologyURLs, final OutputConsole out) {
 			return new AsyncAggregationEngine(new Parameters() {
 
 				@Override
@@ -46,6 +47,11 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 				@Override
 				public Executor getDownloadExecutor() {
 					return Executors.newSingleThreadExecutor();
+				}
+
+				@Override
+				public OutputConsole getOutputConsole() {
+					return out;
 				}
 			});
 		}
@@ -81,11 +87,18 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 		 * @return
 		 */
 		Executor getDownloadExecutor();
+		
+		/**
+		 * A console to send messages to the user
+		 * @return
+		 */
+		OutputConsole getOutputConsole();
 	}
 
 	private final AggregatedQueryEngineFactory queryEngineFactory;
 	private final Executor downloadExecutor;
 	private final TreeSet<URL> ontologyURLs;
+	private final OutputConsole out;
 	private AsyncAggregationEngineState state = null;
 
 
@@ -112,6 +125,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 			}
 		});
 		this.ontologyURLs.addAll(parameters.getOntologies());
+		this.out=parameters.getOutputConsole();
 		setState(new AsyncAggregationEngineCanBuildState(State.IDLE, queryEngineFactory.getEmpty()));
 	}
 
@@ -119,7 +133,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 * Change the current state
 	 * @param newState
 	 */
-	private void setState(AsyncAggregationEngineState newState){
+	private void setState(final AsyncAggregationEngineState newState){
 		this.state=newState;
 		System.out.println("Current state "+state.getStateLabel());
 	}
@@ -180,6 +194,11 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 			@Override
 			public Executor getDownloadExecutor() {
 				return downloadExecutor;
+			}
+
+			@Override
+			public OutputConsole getOutputConsole() {
+				return out;
 			}
 		}, this));
 	}

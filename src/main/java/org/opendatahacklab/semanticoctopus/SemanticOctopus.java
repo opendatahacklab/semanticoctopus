@@ -1,5 +1,6 @@
 package org.opendatahacklab.semanticoctopus;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
 import org.opendatahacklab.semanticoctopus.formatters.IllegalMimeTypeException;
@@ -29,6 +31,7 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class SemanticOctopus {
 
+	private static final OutputConsole out = SystemOutputConsole.INSTANCE;
 	/**
 	 * Aggregate the ontologies passed as command line parameters. The resulting
 	 * ontology is sent on the standard output.
@@ -38,21 +41,23 @@ public class SemanticOctopus {
 	 */
 	public static void main(final String[] args) throws MalformedURLException {
 		if (args.length < 3) {
-			System.err.println("Usage: java -jar semanticoctopus-" + Version.VERSION
+			out.println("Usage: java -jar semanticoctopus-" + Version.VERSION
 					+ " <host> <port> <ontologyURL1> [ontologyURL2 [ontologyURL3 ...]]");
 			System.exit(1);
 		}
 
 		try {
-			final QueryEngine engine = generateEngine(args);
-			final QueryExecutor executor = generateQueryExecutor(engine);
-			generateAndStartServer(args[0], Integer.parseInt(args[1]), executor);
+			final AggregationEngine engine = generateEngine(args);
+			generateAndStartServer(args[0], Integer.parseInt(args[1]), engine);
+			CommandConsole c = new CommandConsole(engine, System.in, out);
+			c.start();
 		} catch (final NumberFormatException e) {
 			System.err.println("Port must be a numeric value");
 			System.exit(2);
+		} catch (final IOException e) {
+			e.printStackTrace();
+			System.exit(2);
 		}
-
-		System.out.println("\n***** Endpoint started *****\n");
 	}
 
 	/**
@@ -78,11 +83,9 @@ public class SemanticOctopus {
 	 * 
 	 * @throws MalformedURLException
 	 */
-	private static QueryEngine generateEngine(final String[] args) throws MalformedURLException {
+	private static AggregationEngine generateEngine(final String[] args) throws MalformedURLException {
 		final List<URL> ontologies = loadOntologies(args);
-		final QueryEngine engine = AsyncAggregationEngine.FACTORY.create(ontologies);
-
-		return engine;
+		return AsyncAggregationEngine.FACTORY.create(ontologies, out);
 	}
 
 	/**
@@ -107,7 +110,8 @@ public class SemanticOctopus {
 	 *
 	 * @throws IllegalMimeTypeException
 	 */
-	private static HttpServer generateAndStartServer(final String host, final int port, final QueryExecutor executor) {
+	private static HttpServer generateAndStartServer(final String host, final int port, final QueryEngine engine) {
+		final QueryExecutor executor = generateQueryExecutor(engine);
 		System.setProperty("logs.folder", ".");
 		final UriBuilder baseBuilder = UriBuilder.fromUri(host).port(port).path("/");
 		final URI baseUri = baseBuilder.build();

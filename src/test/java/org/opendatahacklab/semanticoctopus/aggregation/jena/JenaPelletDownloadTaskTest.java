@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
+import org.opendatahacklab.semanticoctopus.SystemOutputConsole;
 import org.opendatahacklab.semanticoctopus.aggregation.AbstractAggregationTest;
 import org.opendatahacklab.semanticoctopus.aggregation.QueryEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngine;
@@ -66,7 +67,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 					public void error(final InconsistenOntologyException error) {
 						fail("Unexpected inconsistent ontology");
 					}
-				});
+				}, SystemOutputConsole.INSTANCE);
 		downloadTask.run();
 		return queryReference.get();
 	}
@@ -94,7 +95,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 					public void error(final InconsistenOntologyException error) {
 						assertFalse(errorCalled.getAndSet(true));
 					}
-				});
+				}, SystemOutputConsole.INSTANCE);
 		downloadTask.run();
 		assertTrue(errorCalled.get());
 	}
@@ -124,7 +125,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 					public void error(final InconsistenOntologyException error) {
 						fail("Unexpected inconsistent ontology");
 					}
-				});
+				}, SystemOutputConsole.INSTANCE);
 		downloadTask.run();
 		assertTrue(errorCalled.get());
 	}

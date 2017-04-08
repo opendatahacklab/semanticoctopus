@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
+import org.opendatahacklab.semanticoctopus.OutputConsole;
+import org.opendatahacklab.semanticoctopus.SystemOutputConsole;
 import org.opendatahacklab.semanticoctopus.aggregation.AbstractAggregationTest;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
@@ -58,6 +60,11 @@ public class JenaPelletAggregationEngineDownloadAndAggregationTest extends Abstr
 			@Override
 			public Executor getDownloadExecutor() {
 				return executor;
+			}
+
+			@Override
+			public OutputConsole getOutputConsole() {
+				return SystemOutputConsole.INSTANCE;
 			}
 		});
 		assertSame(AggregationEngine.State.IDLE, engine.getState());

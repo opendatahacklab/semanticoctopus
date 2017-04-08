@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.junit.Test;
+import org.opendatahacklab.semanticoctopus.OutputConsole;
+import org.opendatahacklab.semanticoctopus.SystemOutputConsole;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregatedQueryEngineFactory;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine.State;
@@ -66,8 +68,8 @@ public class AsyncAggregationEngineTest {
 		}
 
 		@Override
-		public Runnable getDownloadTask(final Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
-			return delegate.getDownloadTask(ontologyURLs, handler);
+		public Runnable getDownloadTask(final Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
+			return delegate.getDownloadTask(ontologyURLs, handler, out);
 		}
 
 	}
@@ -86,7 +88,7 @@ public class AsyncAggregationEngineTest {
 		}
 
 		@Override
-		public Runnable getDownloadTask(final Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+		public Runnable getDownloadTask(final Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 			fail("unexpected method call");
 			return null;
 		}
@@ -123,6 +125,11 @@ public class AsyncAggregationEngineTest {
 			@Override
 			public Executor getDownloadExecutor() {
 				return executor;
+			}
+
+			@Override
+			public OutputConsole getOutputConsole() {
+				return SystemOutputConsole.INSTANCE;
 			}
 		});
 	}
@@ -167,7 +174,7 @@ public class AsyncAggregationEngineTest {
 	private void goToBuilding(){
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler, OutputConsole out) {
 				return ExplicitExecutor.BLOCKING;
 			}
 		});
@@ -221,7 +228,7 @@ public class AsyncAggregationEngineTest {
 	private void gotToReady() {
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
@@ -290,7 +297,7 @@ public class AsyncAggregationEngineTest {
 		final OntologyDownloadError error = new OntologyDownloadError(new URL("http://error.org"), "error");
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
@@ -313,7 +320,7 @@ public class AsyncAggregationEngineTest {
 	private void goToErrorInconsistentOntology(){
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
@@ -368,7 +375,7 @@ public class AsyncAggregationEngineTest {
 		gotToReady();
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler, OutputConsole out) {
 				return ExplicitExecutor.BLOCKING;
 			}
 		});
@@ -408,7 +415,7 @@ public class AsyncAggregationEngineTest {
 		goToError();
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, OntologyDonwloadHandler handler, OutputConsole out) {
 				return ExplicitExecutor.BLOCKING;
 			}
 		});
@@ -446,7 +453,7 @@ public class AsyncAggregationEngineTest {
 		gotToReady();
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
@@ -498,7 +505,7 @@ public class AsyncAggregationEngineTest {
 		goToError();
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
@@ -552,7 +559,7 @@ public class AsyncAggregationEngineTest {
 		final OntologyDownloadError error = new OntologyDownloadError(new URL("http://error.org"), "error");
 		factory.setDelegate(new FailingFactory() {
 			@Override
-			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler) {
+			public Runnable getDownloadTask(Collection<URL> ontologyURLs, final OntologyDonwloadHandler handler, OutputConsole out) {
 				return new Runnable() {
 
 					@Override
