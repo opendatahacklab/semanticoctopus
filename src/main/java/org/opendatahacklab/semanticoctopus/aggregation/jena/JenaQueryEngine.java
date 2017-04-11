@@ -25,7 +25,7 @@ public class JenaQueryEngine implements QueryEngine{
 	/**
 	 * 
 	 */
-	public JenaQueryEngine(OntModel model) {
+	public JenaQueryEngine(final OntModel model) {
 		this.model=model;
 	}
 
@@ -42,7 +42,7 @@ public class JenaQueryEngine implements QueryEngine{
 	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#execQuery(java.lang.String)
 	 */
 	@Override
-	public ResultSet execQuery(String query) throws QueryParseException {
+	public ResultSet execQuery(final String query) throws QueryParseException {
 		final QueryExecution execution = QueryExecutionFactory.create(QueryFactory.create(query), model);
 		return execution.execSelect();
 	}

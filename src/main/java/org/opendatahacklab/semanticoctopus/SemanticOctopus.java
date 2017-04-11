@@ -51,6 +51,8 @@ public class SemanticOctopus {
 			generateAndStartServer(args[0], Integer.parseInt(args[1]), engine);
 			CommandConsole c = new CommandConsole(engine, System.in, out);
 			c.start();
+			engine.dispose();
+			System.exit(0);
 		} catch (final NumberFormatException e) {
 			System.err.println("Port must be a numeric value");
 			System.exit(2);

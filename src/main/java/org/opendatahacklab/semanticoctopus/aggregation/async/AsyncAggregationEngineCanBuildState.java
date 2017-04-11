@@ -39,4 +39,13 @@ public class AsyncAggregationEngineCanBuildState extends AsyncAggregationEngineS
 		parameters.getDownloadExecutor().execute(downloadTask);
 		return new AsyncAggregationEngineBuildingState(getDelegate());
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.async.AsyncAggregationEngineState#dispose()
+	 */
+	@Override
+	public AsyncAggregationEngineState dispose(Parameters parameters){
+		getDelegate().dispose();
+		return new AsyncAggregationEngineDisposedState();
+	}
 }

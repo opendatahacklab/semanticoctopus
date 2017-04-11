@@ -80,7 +80,7 @@ abstract class AsyncAggregationEngineState {
 	 * @param result
 	 * @return the destination state
 	 */
-	public AsyncAggregationEngineState complete(QueryEngine result){
+	public AsyncAggregationEngineState complete(final QueryEngine result){
 		return this;
 	}
 
@@ -96,11 +96,23 @@ abstract class AsyncAggregationEngineState {
 	}
 
 	/**
+ 	 * In the default implementation the event is just ignored. 
+ 	 * 
+	 * Free all resources and goes to disposed state
+	 * @param parameters TODO
+	 * 
+	 * @return the destination state
+	 */
+	public AsyncAggregationEngineState dispose(final Parameters parameters){
+		return this;
+	}
+
+	/**
 	 * Get the delegate query engine actually in use
 	 * 
 	 * @return
 	 */
-	protected QueryEngine getDelegate(){
+	protected final QueryEngine getDelegate(){
 		return delegate;
 	}
 }

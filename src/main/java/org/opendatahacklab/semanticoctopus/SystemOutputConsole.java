@@ -22,6 +22,6 @@ public class SystemOutputConsole implements OutputConsole {
 	 */
 	@Override
 	public synchronized void print(final String message) {
-		System.out.println(message);
+		System.out.print(message);
 	}
 }

@@ -95,10 +95,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 		OutputConsole getOutputConsole();
 	}
 
-	private final AggregatedQueryEngineFactory queryEngineFactory;
-	private final Executor downloadExecutor;
-	private final TreeSet<URL> ontologyURLs;
-	private final OutputConsole out;
+	private final Parameters parameters;
 	private AsyncAggregationEngineState state = null;
 
 
@@ -115,17 +112,42 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 *            download task. It is expected to run in another thread.
 	 */
 	public AsyncAggregationEngine(final Parameters parameters) {
-		this.queryEngineFactory = parameters.getQueryEngineFactory();
-		this.downloadExecutor = parameters.getDownloadExecutor();
-		this.ontologyURLs = new TreeSet<URL>(new Comparator<URL>() {
+		final AggregatedQueryEngineFactory queryEngineFactory = parameters.getQueryEngineFactory();
+		final Executor downloadExecutor = parameters.getDownloadExecutor();
+		final Collection<URL> ontologyURLs = new TreeSet<URL>(new Comparator<URL>() {
 
 			@Override
 			public int compare(final URL o1, final URL o2) {
 				return o1.toString().compareTo(o2.toString());
 			}
 		});
-		this.ontologyURLs.addAll(parameters.getOntologies());
-		this.out=parameters.getOutputConsole();
+		ontologyURLs.addAll(parameters.getOntologies());
+		final OutputConsole out=parameters.getOutputConsole();
+		//create a safe copy of parameters
+		this.parameters = new Parameters() {
+			
+			@Override
+			public AggregatedQueryEngineFactory getQueryEngineFactory() {
+				return queryEngineFactory;
+			}
+			
+			@Override
+			public Collection<URL> getOntologies() {
+				return ontologyURLs;
+			}
+			
+			@Override
+			public Executor getDownloadExecutor() {
+				return downloadExecutor;
+			}
+
+			@Override
+			public OutputConsole getOutputConsole() {
+				return out;
+			}
+		};
+		
+		//go to IDLE state
 		setState(new AsyncAggregationEngineCanBuildState(State.IDLE, queryEngineFactory.getEmpty()));
 	}
 
@@ -157,7 +179,13 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public ResultSet execQuery(final String query) throws QueryParseException {
-		return state.execQuery(query);
+		parameters.getOutputConsole().println("Requested execution of query");
+		parameters.getOutputConsole().println("query");
+		final long starTime = System.currentTimeMillis();
+		final ResultSet result = state.execQuery(query);
+		final long endTime = System.currentTimeMillis();
+		parameters.getOutputConsole().println("query completed in "+(endTime-starTime)+" milliseconds with returning "+result.getRowNumber()+" rows.");
+		return result;
 	}
 
 	/*
@@ -168,7 +196,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public Collection<URL> getOntologies() {
-		return new ArrayList<>(ontologyURLs);
+		return new ArrayList<>(parameters.getOntologies());
 	}
 
 	/*
@@ -179,28 +207,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public synchronized void build() {
-		setState(state.build(new Parameters() {
-			
-			@Override
-			public AggregatedQueryEngineFactory getQueryEngineFactory() {
-				return queryEngineFactory;
-			}
-			
-			@Override
-			public Collection<URL> getOntologies() {
-				return ontologyURLs;
-			}
-			
-			@Override
-			public Executor getDownloadExecutor() {
-				return downloadExecutor;
-			}
-
-			@Override
-			public OutputConsole getOutputConsole() {
-				return out;
-			}
-		}, this));
+		setState(state.build(parameters, this));
 	}
 
 	/*
@@ -256,7 +263,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public synchronized void dispose() {
-		throw new UnsupportedOperationException();
+		setState(state.dispose(parameters));
 	}
 
 	/* (non-Javadoc)

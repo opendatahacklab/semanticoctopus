@@ -16,6 +16,10 @@ import java.util.Collection;
  * as consequence of a refresh request; ERROR if some error occurred
  * during the last update. The ERROR may be fixed with a subsequent refresh.
  * 
+ * The final state is DISPOSED. In this state all resources has been free and threads
+ * started for some purposes, other than the main one, has been stopped. In building engine
+ * any dispose request is just ignored. 
+ * 
  * Aggregation Engines SHOULD be created via an {@link AggregationEngineFactory}
  * 
  * @author Cristiano Longo
@@ -23,7 +27,7 @@ import java.util.Collection;
  */
 public interface AggregationEngine extends QueryEngine{
 	enum State {
-		IDLE, BUILDING, READY, ERROR; 
+		IDLE, BUILDING, READY, ERROR, DISPOSED; 
 	}
 	
 	/**
