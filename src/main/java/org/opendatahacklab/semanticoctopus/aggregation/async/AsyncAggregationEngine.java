@@ -157,7 +157,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	private void setState(final AsyncAggregationEngineState newState){
 		this.state=newState;
-		System.out.println("Current state "+state.getStateLabel());
+		parameters.getOutputConsole().println("Current state "+state.getStateLabel());
 	}
 	/*
 	 * (non-Javadoc)

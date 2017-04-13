@@ -60,7 +60,7 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 				handler.error(new OntologyDownloadError(u, e));
 				return;
 			}
-		out.println("Reasoning strted");
+		out.println("Consistency check strted");
 		final ValidityReport report = model.validate();
 		if (report.isValid())
 			handler.complete(new JenaQueryEngine(model));
@@ -68,6 +68,6 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 			model.close();
 			handler.error(new InconsistenOntologyException());
 		}
-		System.out.println("Reasoning complete");
+		out.println("Consistency check complete");
 	}
 }
