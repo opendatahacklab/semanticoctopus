@@ -63,18 +63,24 @@
 
 	<section>
 		<header>
-			<h2>COMPILE AND INSTALL</h2>
+			<h2>GET AND INSTALL</h2>
 		</header>
 		<p>
 			<em>Semantic Octopus</em> can be compiled from sources with <a
 				href="https://maven.apache.org/">maven</a> (just run
 			<code>mvn install</code>
-			in the sources root). After compilation you will find a
+			in the sources root). After compilation you will  find a
 			<code>semanticoctopus-[vers]-jar-with-dependencies.jar</code>
 			file in the maven-generated
 			<code>target</code>
-			directory. The endpoint can be setup with the following command:
-		</p>
+			directory.</p>
+		<p>Otherwise, you can get this jar in one of the binary releases:</p>
+		<ul>
+			<li><a href="releases/semanticoctopus0.2.0.tgz">semanticoctopus0.2.0.tgz</a></li>
+			<li><a href="releases/semanticoctopus0.2.0.zip">semanticoctopus0.2.0.zip</a></li>
+		</ul> 
+			
+		<p>The endpoint can be setup with the following command:</p>
 		<code>
 			<pre>
 java -jar semanticoctopus-version-jar-with-dependencies.jar endpointhost enpointport kburl1 [kburl2 [... kburln]] 
