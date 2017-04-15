@@ -23,7 +23,7 @@
 			</ol>
 			<a href="https://github.com/opendatahacklab/semanticoctopus.git"
 				alt="Source Code" title="GitHub repository"><img alt="GitHub"
-				src="../commons/imgs/GitHub-Mark-64px.png"></a> 
+				src="../commons/imgs/GitHub-Mark-64px.png"></a>
 		</nav>
 	</header>
 	<section>
@@ -31,86 +31,23 @@
 			<h2>INTRODUCTION</h2>
 		</header>
 		<p>
-			The <em>Semantic Octopus</em> is a java application which allows one to
-			publish a <a href="https://www.w3.org/TR/sparql11-overview/" title="SPARQL 1.1 Overview">SPARQL</a> 
-			endpoint providing a knowledge base obtained by aggregating
-			multiple <a href="https://www.w3.org/TR/rdf11-primer/" title="RDF 1.1 Primer">RDF</a> 
-			knowledge bases from the web and performing subsequent reasoning (OWL-DL). The Semantic Octopus
-			is based on <a href="http://jena.apache.org/">jena</a> and <a href="https://github.com/ansell/pellet">pellet (ansell version)</a>.
-			We use it in conjunction with a <a href="https://github.com/opendatahacklab/php-transparent-proxy">php proxy</a> for 
-			security reasons. A running instance of Semantic Octopus is currently used to provide
-			the <a href="http://opendatahacklab.org">opendatahacklab</a> knowledge base and to generate the
-			contents of some pages (see for example the
-			<a href="http://opendatahacklab.org/projects.html">opendatahacklab projects</a> page.)  
-		</p>				
-	</section>
-
-	<section>
-		<header>
-			<h2>COMPILE AND INSTALL</h2>
-		</header>
-		<p>
-			<em>Semantic Octopus</em> can be compiled from sources with 
-			<a href="https://maven.apache.org/">maven</a> (just run <code>mvn install</code> in
-			the sources root). After compilation you will find a <code>semanticoctopus-[vers]-jar-with-dependencies.jar</code>
-			file in the maven-generated <code>target</code> directory. The endpoint
-			can be setup with the following command:
-		</p>				
-		<code><pre>
-java -jar semanticoctopus-version-jar-with-dependencies.jar endpointhost enpointport kburl1 [kburl2 [... kburln]] 
-		</pre></code>
-		<p>where
-		<ol>
-			<li><code>version</code> is the semantic octopus version;</li>
-			<li><code>endpointhost</code> is the host name under which the aggregated ontology will be provided;</li>
-			<li><code>enpointport</code> is the endpoint port; </li>
-			<li><code>kburl1</code>, ..., <code>kburln</code> are the URLs of the ontologies to be aggregated.</li>
-		</ol>
+			The <em>Semantic Octopus</em> is a java application which allows one
+			to publish a <a href="https://www.w3.org/TR/sparql11-overview/"
+				title="SPARQL 1.1 Overview">SPARQL</a> endpoint providing a
+			knowledge base obtained by aggregating multiple <a
+				href="https://www.w3.org/TR/rdf11-primer/" title="RDF 1.1 Primer">RDF</a>
+			knowledge bases from the web and performing subsequent reasoning
+			(OWL-DL). The Semantic Octopus is based on <a
+				href="http://jena.apache.org/">jena</a> and <a
+				href="https://github.com/ansell/pellet">pellet (ansell version)</a>.
+			We use it in conjunction with a <a
+				href="https://github.com/opendatahacklab/php-transparent-proxy">php
+				proxy</a> for security reasons. A running instance of Semantic Octopus
+			is currently used to provide the <a href="http://opendatahacklab.org">opendatahacklab</a>
+			knowledge base and to generate the contents of some pages (see for
+			example the <a href="http://opendatahacklab.org/projects.html">opendatahacklab
+				projects</a> page.)
 		</p>
-		<p>
-		For example, the following will start a sparql endpoint at port 9001 of localhost which
-		provide the main opendatahacklab projects and events knowledge base.		
-		</p>
-		<code><pre>
-java -jar semanticoctopus-0.2.0-jar-with-dependencies.jar http://localhost 9000 http://opendatahacklab.org/site/odhl.owl
-		</pre></code>
-		
-		<p>Once started, the semantic octopus interactive console is displayed. With typing <code>help</code>
-		you can get all the available commands, which are explained in details in the following section.
-		To start using the endpoint just enter <code>build</code> in the console and wait until
-		aggregation and reasoning ends.</p> 
-	</section>
-
-	<section>
-		<header>
-			<h2>USAGE AND LIFECYCLE</h2>
-		</header>
-		<p>The following commanda are available in the semantic octopus console:</p>
-		<ul>
-			<li><code>help</code> prompt all available commands;
-			<li><code>list</code> print the list <code>kburl1</code>, ..., <code>kburln</code> of ontology 
-			URLs which will partecipate in forming the provided knowledge base;</li>
-			<li><code>build</code> start aggregation and reasoning;</li>
-			<li><code>state</code> print the current state of the semantic octopus instance;</li>
-			<li><code>exit</code> finish the execution of the instance and free all resources.</li>
-		</ul>
-		<p>A semantic octopus instance can be in one of the following states:</p>
-		<ul>
-			<li><code>IDLE</code> is the initial state, non aggregation has take place and
-			the knowledge base provided via the endpoint is the empty one;</li>
-			<li><code>BUILDING</code> state means that the octopus has started 
-			downloading the ontologies, performing reasoning and checking aggregated ontology consistency;</li>
-			<li><code>READY</code> state means that aggregation was succesful and the resulting aggregated ontology is consistent;</li>
-			<li><code>ERROR</code> state is entered when the building phase failed because of some error 
-			downloading ontologies of because the resulting ontology was not consistent.</li>
-			<li><code>DISPOSED</code> is the final state, reached when the user enter the <code>exit</code>
-			command and all resources are free.</li>
-		</ul>
-		
-		<img src="states.svg" title="states diagram - created with DIA https://wiki.gnome.org/Apps/Dia" />
-		<p>Note that any command is just ignored in <code>BUILDING</code> state. In addition, in <code>BUILDING</code>
-		and <code>ERROR</code> state the ontology previously generated by the last succesful build is server,
-		until a new consistent aggregated ontology is available due to a succesful build.</p>
 	</section>
 
 	<section>
@@ -122,6 +59,142 @@ java -jar semanticoctopus-0.2.0-jar-with-dependencies.jar http://localhost 9000 
 			<li>Antonio Pisasale</li>
 			<li>Gabriella Verga</li>
 		</ul>
+	</section>
+
+	<section>
+		<header>
+			<h2>COMPILE AND INSTALL</h2>
+		</header>
+		<p>
+			<em>Semantic Octopus</em> can be compiled from sources with <a
+				href="https://maven.apache.org/">maven</a> (just run
+			<code>mvn install</code>
+			in the sources root). After compilation you will find a
+			<code>semanticoctopus-[vers]-jar-with-dependencies.jar</code>
+			file in the maven-generated
+			<code>target</code>
+			directory. The endpoint can be setup with the following command:
+		</p>
+		<code>
+			<pre>
+java -jar semanticoctopus-version-jar-with-dependencies.jar endpointhost enpointport kburl1 [kburl2 [... kburln]] 
+		</pre>
+		</code>
+		<p>where
+		<ol>
+			<li><code>version</code> is the semantic octopus version;</li>
+			<li><code>endpointhost</code> is the host name under which the
+				aggregated ontology will be provided;</li>
+			<li><code>enpointport</code> is the endpoint port;</li>
+			<li><code>kburl1</code>, ..., <code>kburln</code> are the URLs
+				of the ontologies to be aggregated.</li>
+		</ol>
+		</p>
+		<p>For example, the following will start a sparql endpoint at port
+			9001 of localhost which provide the main opendatahacklab projects and
+			events knowledge base.</p>
+		<code>
+			<pre>
+java -jar semanticoctopus-0.2.0-jar-with-dependencies.jar http://localhost 9000 http://opendatahacklab.org/site/odhl.owl
+		</pre>
+		</code>
+
+		<p>
+			Once started, the semantic octopus interactive console is displayed.
+			With typing
+			<code>help</code>
+			you can get all the available commands, which are explained in
+			details in the following section. To start using the endpoint just
+			enter
+			<code>build</code>
+			in the console and wait until aggregation and reasoning ends.
+		</p>
+	</section>
+
+	<section>
+		<header>
+			<h2>USAGE AND LIFECYCLE</h2>
+		</header>
+		<p>The following commanda are available in the semantic octopus
+			console:</p>
+		<ul>
+			<li><code>help</code> prompt all available commands;
+			<li><code>list</code> print the list <code>kburl1</code>, ..., <code>kburln</code>
+				of ontology URLs which will partecipate in forming the provided
+				knowledge base;</li>
+			<li><code>build</code> start aggregation and reasoning;</li>
+			<li><code>state</code> print the current state of the semantic
+				octopus instance;</li>
+			<li><code>exit</code> finish the execution of the instance and
+				free all resources.</li>
+		</ul>
+		<p>A semantic octopus instance can be in one of the following
+			states:</p>
+		<ul>
+			<li><code>IDLE</code> is the initial state, non aggregation has
+				take place and the knowledge base provided via the endpoint is the
+				empty one;</li>
+			<li><code>BUILDING</code> state means that the octopus has
+				started downloading the ontologies, performing reasoning and
+				checking aggregated ontology consistency;</li>
+			<li><code>READY</code> state means that aggregation was
+				succesful and the resulting aggregated ontology is consistent;</li>
+			<li><code>ERROR</code> state is entered when the building phase
+				failed because of some error downloading ontologies of because the
+				resulting ontology was not consistent.</li>
+			<li><code>DISPOSED</code> is the final state, reached when the
+				user enter the <code>exit</code> command and all resources are free.</li>
+		</ul>
+
+		<img src="states.svg"
+			title="states diagram - created with DIA https://wiki.gnome.org/Apps/Dia" />
+		<p>
+			Note that any command is just ignored in
+			<code>BUILDING</code>
+			state. In addition, in
+			<code>BUILDING</code>
+			and
+			<code>ERROR</code>
+			state the ontology previously generated by the last succesful build
+			is server, until a new consistent aggregated ontology is available
+			due to a succesful build.
+		</p>
+	</section>
+
+	<section>
+		<header>
+			<h2>LICENSE</h2>
+		</header>
+		<p>Copyright 2017 Cristiano Longo, Antonio Pisasale, Gabriella
+			Verga</p>
+		<p>Semantic Octopus is free software: you can redistribute it
+			and/or modify it under the terms of the GNU Lesser General Public
+			License as published by the Free Software Foundation, either version
+			3 of the License, or (at your option) any later version.</p>
+
+		<p>
+			Semantic Octopus is distributed in the hope that it will be useful,
+			but WITHOUT ANY WARRANTY; without even the implied warranty of
+			MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+			Lesser General Public License for more details. You should have
+			received a copy of the GNU Lesser General Public License along with
+			this program. If not, see <a href="http://www.gnu.org/licenses">http://www.gnu.org/licenses</a>.
+		</p>
+
+		<section>
+			<header>
+				<h3>Additional License Note</h3>
+			</header>
+			<p>
+				Please note that semantic octopus is built upon <a
+					href="http://jena.apache.org/">jena</a> <a
+					href="https://github.com/ansell/pellet">pellet (ansell version)</a>,
+				which have their own licenses (apache and agpl, respectively).
+				Please take this into account when using and redistributing Semantic
+				Octopus.
+			</p>
+		</section>
+
 	</section>
 </body>
 </html>
