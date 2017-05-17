@@ -3,6 +3,7 @@
  */
 package org.opendatahacklab.semanticoctopus.aggregation.async;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -500,6 +501,7 @@ public class AsyncAggregationEngineTest {
 	public void shouldOldEngineDisposedAfterSuccesfulRebuild(){
 		goToRebuild();
 		assertTrue(ENGINE1.isDisposed());
+		assertFalse(ENGINE2.isDisposed());
 		assertSame(RESULT2, testSubject.execQuery(QUERY2));
 	}
 

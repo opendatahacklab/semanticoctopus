@@ -93,4 +93,12 @@ public class FixedQueryEngine implements QueryEngine {
 		return disposed;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#getInfo()
+	 */
+	@Override
+	public String getInfo() {
+		return "FixedQueryEngine: expected query="+expectedQuery+"; disposed="+disposed;
+	}
+
 }

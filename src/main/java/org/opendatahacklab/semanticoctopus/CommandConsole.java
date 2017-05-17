@@ -79,6 +79,20 @@ public class CommandConsole{
 	};
 
 	/**
+	 * print information about the engine currently in use
+	 */
+	private final ConsoleCommand info = new ConsoleCommand() {
+		
+		@Override
+		public boolean handle(final String command, final AggregationEngine engine, final OutputConsole out) {
+			if (!"info".equals(command))
+				return false;
+			out.println(engine.getInfo());
+			return true;
+		}
+	};
+
+	/**
 	 * print the list of ontologies
 	 */
 	private final ConsoleCommand list = new ConsoleCommand() {
@@ -118,7 +132,7 @@ public class CommandConsole{
 	private final AggregationEngine engine;
 	private final BufferedReader in;
 	private final OutputConsole out;
-	private final ConsoleCommand[] availableCommands = {build, state, list, help};
+	private final ConsoleCommand[] availableCommands = {build, state, list, info, help};
 	
 	/**
 	 * @param engine

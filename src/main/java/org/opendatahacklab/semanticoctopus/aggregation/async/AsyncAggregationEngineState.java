@@ -131,4 +131,11 @@ abstract class AsyncAggregationEngineState {
 	protected final QueryEngine getDelegate(){
 		return delegate;
 	}
+	
+	/**
+	 * @return
+	 */
+	public String getInfo(){
+		return delegate.getInfo();
+	}
 }

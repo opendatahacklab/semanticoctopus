@@ -56,4 +56,11 @@ public interface QueryEngine {
 	 * @return
 	 */
 	boolean isDisposed();
+	
+	/**
+	 * Print human readable information and metadata about this instance.
+	 * 
+	 * @return
+	 */
+	String getInfo();
 }

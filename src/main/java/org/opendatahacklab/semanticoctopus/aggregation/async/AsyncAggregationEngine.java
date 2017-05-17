@@ -62,7 +62,7 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 
 				@Override
 				public Executor getDownloadExecutor() {
-					return Executors.newSingleThreadExecutor();
+					return Executors.newCachedThreadPool();
 				}
 
 				@Override
@@ -195,8 +195,9 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	 */
 	@Override
 	public ResultSet execQuery(final String query) throws QueryParseException {
-		parameters.getOutputConsole().println("Requested execution of query");
-		parameters.getOutputConsole().println("query");
+		parameters.getOutputConsole().println("AggregationEngine: executing query "+query);
+		parameters.getOutputConsole().println("Current state "+state.getStateLabel());
+		parameters.getOutputConsole().println("Using query engine "+state.getInfo());
 		final long starTime = System.currentTimeMillis();
 		final ResultSet result = state.execQuery(query);
 		final long endTime = System.currentTimeMillis();
@@ -288,6 +289,14 @@ public class AsyncAggregationEngine implements AggregationEngine, OntologyDonwlo
 	@Override
 	public boolean isDisposed() {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opendatahacklab.semanticoctopus.aggregation.QueryEngine#getInfo()
+	 */
+	@Override
+	public String getInfo() {
+		return state.getInfo();
 	}
 
 }
