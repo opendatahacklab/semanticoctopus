@@ -28,22 +28,23 @@ import com.hp.hpl.jena.query.ResultSet;
  * 
  * @author Cristiano Longo
  *
- * This file is part of Semantic Octopus.
+ *         This file is part of Semantic Octopus.
  * 
- * Copyright 2017 Cristiano Longo, Antonio Pisasale
+ *         Copyright 2017 Cristiano Longo, Antonio Pisasale
  *
- * Semantic Octopus is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *         Semantic Octopus is free software: you can redistribute it and/or
+ *         modify it under the terms of the GNU Lesser General Public License as
+ *         published by the Free Software Foundation, either version 3 of the
+ *         License, or (at your option) any later version.
  *
- * Semantic Octopus is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *         Semantic Octopus is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *         Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *         You should have received a copy of the GNU Lesser General Public
+ *         License along with this program. If not, see
+ *         <http://www.gnu.org/licenses/>.
  */
 public abstract class AbstractAggregationTest {
 
@@ -102,6 +103,35 @@ public abstract class AbstractAggregationTest {
 
 	/**
 	 * Perform a query about relatives against the ontology obtained by
+	 * aggregating a set of ontologies and using the specified engine.
+	 * 
+	 * @param engine
+	 * @param expected
+	 *            pairs expected to be returned as result of the relative query
+	 * @throws InterruptedException
+	 */
+	private void testRelatives(final QueryEngine engine, final List<RelativePair> expected) throws InterruptedException {
+		engine.write(System.out, "http://example.org");
+		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
+		final Iterator<RelativePair> expectedIt = expected.iterator();
+		int n = 0;
+		while (expectedIt.hasNext()) {
+			n++;
+			final RelativePair expectedPair = expectedIt.next();
+			assertTrue("Too less pairs returned rows=" + n, actual.hasNext());
+			final QuerySolution actualPair = actual.next();
+			final String actualx = actualPair.get("x").asResource().getURI();
+			final String actualy = actualPair.get("y").asResource().getURI();
+			System.out.println("Expected (x=" + expectedPair.x + ",y=" + expectedPair.y + "); Actual (x=" + actualx
+					+ ",y=" + actualy + ")");
+			assertEquals("row=" + n, expectedPair.x, actualx);
+			assertEquals("row=" + n, expectedPair.y, actualy);
+		}
+		assertFalse("Too much pairs returned. Rows=" + n, actual.hasNext());
+	}
+
+	/**
+	 * Perform a query about relatives against the ontology obtained by
 	 * aggregating a set of ontologies.
 	 * 
 	 * @param ontologies
@@ -113,22 +143,8 @@ public abstract class AbstractAggregationTest {
 	private void testRelatives(final Collection<URL> ontologies, final List<RelativePair> expected)
 			throws InterruptedException {
 		final QueryEngine engine = createSuccesTestSubject(ontologies);
-		engine.write(System.out, "http://example.org");
-		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
-		final Iterator<RelativePair> expectedIt = expected.iterator();
-		int n = 0;
-		while (expectedIt.hasNext()) {
-			n++;
-			final RelativePair expectedPair = expectedIt.next();
-			assertTrue("Too less pairs returned rows=" + n, actual.hasNext());
-			final QuerySolution actualPair = actual.next();
-			final String actualx = actualPair.get("x").asResource().getURI();
-			final String actualy = actualPair.get("y").asResource().getURI();			
-			System.out.println("Expected (x="+expectedPair.x+",y="+expectedPair.y+"); Actual (x="+actualx+",y="+actualy+")");
-			assertEquals("row=" + n, expectedPair.x, actualx);
-			assertEquals("row=" + n, expectedPair.y, actualy);
-		}
-		assertFalse("Too much pairs returned. Rows=" + n, actual.hasNext());
+		testRelatives(engine, expected);
+		engine.dispose();
 	}
 
 	/**
@@ -245,6 +261,31 @@ public abstract class AbstractAggregationTest {
 	}
 
 	/**
+	 * Test that disposing of an engine does not affect other ones.
+	 * @throws InterruptedException 
+	 * 
+	 */
+	@Test
+	public void testSubsequentDownloads() throws InterruptedException{
+		final URL[] ontologiesAB = { vocabulary, ontologyA, ontologyB };
+		final List<URL> ontologiesABlist = Arrays.asList(ontologiesAB);		
+		final RelativePair[] expectedAB = { new RelativePair(individualA, individualB),
+				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC) };
+		final List<RelativePair> expectedABlist = Arrays.asList(expectedAB);
+		final QueryEngine e1 = createSuccesTestSubject(ontologiesABlist);
+		testRelatives(e1, expectedABlist);
+		
+		final URL[] ontologiesBC = { vocabulary, ontologyB, ontologyC };
+		final List<URL> ontologiesBClist = Arrays.asList(ontologiesBC);		
+		final RelativePair[] expectedBC = { new RelativePair(individualB, individualC),
+				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
+		final List<RelativePair> expectedBClist = Arrays.asList(expectedBC);
+		final QueryEngine e2 = createSuccesTestSubject(ontologiesBClist);
+		e1.dispose();
+		testRelatives(e2, expectedBClist);
+		e2.dispose();
+	}
+	/**
 	 * Test that no inference is performed when ontologies A and C are loaded
 	 * 
 	 * @throws InterruptedException
@@ -301,6 +342,7 @@ public abstract class AbstractAggregationTest {
 		final String resultItem = actual.next().getResource("?x").getURI();
 		assertEquals("http://opendatahacklab.org/semanticoctopus/testbed/a", resultItem);
 		assertFalse(actual.hasNext());
+		engine.dispose();
 	}
 
 	/**
@@ -318,6 +360,7 @@ public abstract class AbstractAggregationTest {
 		assertEquals(individualA, s.getResource("?x").getURI());
 		assertEquals(individualB, s.getResource("?y").getURI());
 		assertFalse(actual.hasNext());
+		engine.dispose();
 	}
 
 	/**

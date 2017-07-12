@@ -86,7 +86,6 @@ public class JenaQueryEngine implements QueryEngine {
 	 */
 	@Override
 	public void dispose() {
-		//System.out.println("Disposing "+model+" and graph "+model.getGraph());
 		model.close();
 	}
 

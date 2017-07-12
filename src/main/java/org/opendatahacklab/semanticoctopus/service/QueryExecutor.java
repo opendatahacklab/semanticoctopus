@@ -173,6 +173,7 @@ public class QueryExecutor {
 	public Response executeQueryViaPOST(@HeaderParam("Accept") final String acceptedFormat, final String query,
 			@QueryParam("default-graph-uri") final String defaultGraphUri,
 			@QueryParam("named-graph-uri") final String namedGraphUri) {
+		logRequest("POST", acceptedFormat, query, defaultGraphUri, namedGraphUri);
 		return executeQuery(acceptedFormat, query);
 	}
 
