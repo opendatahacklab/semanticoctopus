@@ -43,12 +43,12 @@ public interface AggregatedQueryEngineFactory {
 	 * Create a task which will perform download. Download results will be
 	 * notified to the handler.
 	 * 
-	 * @param ontologyURLs
-	 *            TODO
+	 * @param ontologyURLs URIs to download the ontologies to be aggregated
+	 *            
 	 * @param handler
 	 *            handle the download operation results
-	 * @param out
-	 *            TODO
+	 * @param out console to output logs
+	 *            
 	 * @return a runnable which will perform download
 	 * @return
 	 */

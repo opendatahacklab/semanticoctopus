@@ -76,14 +76,16 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 				handler.error(new OntologyDownloadError(u, e));
 				return;
 			}
-		out.println("Consistency check strted");
+		out.println("Consistency check started");
 		final ValidityReport report = model.validate();
-		if (report.isValid())
+		if (report.isValid()){
+			out.println("Consistency check succesful complete");
 			handler.complete(new JenaQueryEngine(model));
+		}
 		else {
+			out.println("Consistency check complete with errors");
 			model.close();
 			handler.error(new InconsistenOntologyException());
 		}
-		out.println("Consistency check complete");
 	}
 }

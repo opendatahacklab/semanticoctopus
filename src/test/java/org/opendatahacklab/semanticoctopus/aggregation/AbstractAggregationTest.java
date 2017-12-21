@@ -13,10 +13,10 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
+import org.opendatahacklab.semanticoctopus.aggregation.AggregationTestUtils.RelativePair;
 
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
@@ -48,26 +48,11 @@ import com.hp.hpl.jena.query.ResultSet;
  */
 public abstract class AbstractAggregationTest {
 
+	private final AggregationTestUtils utils = new AggregationTestUtils();
 	private static final String TESTBED_PREFIX = "PREFIX testbed:<http://opendatahacklab.org/semanticoctopus/testbed/>\n";
 	private static final String RELATIVES_QUERY = TESTBED_PREFIX
 			+ "SELECT ?x ?y { ?x testbed:relative ?y }  ORDER BY ?x ?y";
 
-	/**
-	 * An item of the result of a query about relatives
-	 * 
-	 * @author Cristiano Longo
-	 *
-	 */
-	class RelativePair {
-
-		final String x;
-		final String y;
-
-		RelativePair(final String x, final String y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
 
 	protected final URL vocabulary;
 	protected final URL ontologyA;
@@ -103,35 +88,6 @@ public abstract class AbstractAggregationTest {
 
 	/**
 	 * Perform a query about relatives against the ontology obtained by
-	 * aggregating a set of ontologies and using the specified engine.
-	 * 
-	 * @param engine
-	 * @param expected
-	 *            pairs expected to be returned as result of the relative query
-	 * @throws InterruptedException
-	 */
-	private void testRelatives(final QueryEngine engine, final List<RelativePair> expected) throws InterruptedException {
-		engine.write(System.out, "http://example.org");
-		final ResultSet actual = engine.execQuery(RELATIVES_QUERY);
-		final Iterator<RelativePair> expectedIt = expected.iterator();
-		int n = 0;
-		while (expectedIt.hasNext()) {
-			n++;
-			final RelativePair expectedPair = expectedIt.next();
-			assertTrue("Too less pairs returned rows=" + n, actual.hasNext());
-			final QuerySolution actualPair = actual.next();
-			final String actualx = actualPair.get("x").asResource().getURI();
-			final String actualy = actualPair.get("y").asResource().getURI();
-			System.out.println("Expected (x=" + expectedPair.x + ",y=" + expectedPair.y + "); Actual (x=" + actualx
-					+ ",y=" + actualy + ")");
-			assertEquals("row=" + n, expectedPair.x, actualx);
-			assertEquals("row=" + n, expectedPair.y, actualy);
-		}
-		assertFalse("Too much pairs returned. Rows=" + n, actual.hasNext());
-	}
-
-	/**
-	 * Perform a query about relatives against the ontology obtained by
 	 * aggregating a set of ontologies.
 	 * 
 	 * @param ontologies
@@ -143,7 +99,7 @@ public abstract class AbstractAggregationTest {
 	private void testRelatives(final Collection<URL> ontologies, final List<RelativePair> expected)
 			throws InterruptedException {
 		final QueryEngine engine = createSuccesTestSubject(ontologies);
-		testRelatives(engine, expected);
+		utils.testRelatives(engine, expected);
 		engine.dispose();
 	}
 
@@ -188,7 +144,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldLoadOneOntologyWithARelativeAssertion() throws InterruptedException {
-		final URL[] ontologies = { ontologyA };
+		final URL[] ontologies = { utils.ontologyA };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
 		testRelatives(ontologies, expected);
 	}
@@ -200,7 +156,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldLoadSeveralOntologiesWithSeveralRelativeAssertions() throws InterruptedException {
-		final URL[] ontologies = { ontologyA, ontologyB, ontologyC };
+		final URL[] ontologies = { utils.ontologyA, utils.ontologyB, utils.ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualB, individualC), new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
@@ -215,7 +171,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferNoTuplesWithA() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyA };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyA };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
 		testRelatives(ontologies, expected);
 
@@ -228,7 +184,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferNoTuplesWithB() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyB };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyB };
 		final RelativePair[] expected = { new RelativePair(individualB, individualC) };
 		testRelatives(ontologies, expected);
 
@@ -241,7 +197,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferNoTuplesWithC() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyC };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
 
@@ -254,7 +210,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferTuplesWithAB() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyA, ontologyB };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyA, utils.ontologyB };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC) };
 		testRelatives(ontologies, expected);
@@ -267,22 +223,22 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void testSubsequentDownloads() throws InterruptedException{
-		final URL[] ontologiesAB = { vocabulary, ontologyA, ontologyB };
+		final URL[] ontologiesAB = { utils.vocabulary, utils.ontologyA, utils.ontologyB };
 		final List<URL> ontologiesABlist = Arrays.asList(ontologiesAB);		
 		final RelativePair[] expectedAB = { new RelativePair(individualA, individualB),
 				new RelativePair(individualA, individualC), new RelativePair(individualB, individualC) };
 		final List<RelativePair> expectedABlist = Arrays.asList(expectedAB);
 		final QueryEngine e1 = createSuccesTestSubject(ontologiesABlist);
-		testRelatives(e1, expectedABlist);
+		utils.testRelatives(e1, expectedABlist);
 		
-		final URL[] ontologiesBC = { vocabulary, ontologyB, ontologyC };
+		final URL[] ontologiesBC = { utils.vocabulary, utils.ontologyB, utils.ontologyC };
 		final List<URL> ontologiesBClist = Arrays.asList(ontologiesBC);		
 		final RelativePair[] expectedBC = { new RelativePair(individualB, individualC),
 				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
 		final List<RelativePair> expectedBClist = Arrays.asList(expectedBC);
 		final QueryEngine e2 = createSuccesTestSubject(ontologiesBClist);
 		e1.dispose();
-		testRelatives(e2, expectedBClist);
+		utils.testRelatives(e2, expectedBClist);
 		e2.dispose();
 	}
 	/**
@@ -292,7 +248,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferNoTuplesWithAC() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyA, ontologyC };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyA, utils.ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
@@ -306,7 +262,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferTuplesWithBC() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyB, ontologyC };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyB, utils.ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualB, individualC),
 				new RelativePair(individualB, individualD), new RelativePair(individualC, individualD) };
 		testRelatives(ontologies, expected);
@@ -320,7 +276,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferTuplesWithABC() throws InterruptedException {
-		final URL[] ontologies = { vocabulary, ontologyA, ontologyB, ontologyC };
+		final URL[] ontologies = { utils.vocabulary, utils.ontologyA, utils.ontologyB, utils.ontologyC };
 		final RelativePair[] expected = { new RelativePair(individualA, individualB),
 				new RelativePair(individualA, individualC), new RelativePair(individualA, individualD),
 				new RelativePair(individualB, individualC), new RelativePair(individualB, individualD),
@@ -335,7 +291,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferMemberOfSuperclasses() throws InterruptedException {
-		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubclass));
+		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(utils.ontologySubclass));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x { ?x a testbed:B }  ORDER BY ?x ?y");
 		assertTrue(actual.hasNext());
@@ -352,7 +308,7 @@ public abstract class AbstractAggregationTest {
 	 */
 	@Test
 	public void shouldInferRelationBecauseOfSubproperty() throws InterruptedException {
-		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubproperty));
+		final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(utils.ontologySubproperty));
 		engine.write(System.out, "http://example.org");
 		final ResultSet actual = engine.execQuery(TESTBED_PREFIX + "SELECT ?x ?y { ?x testbed:q ?y }");
 		assertTrue(actual.hasNext());
@@ -372,7 +328,7 @@ public abstract class AbstractAggregationTest {
 	@Test
 	public void shouldThrowAnExceptionOnInvalidQuery() throws InterruptedException {
 		try {
-			final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(ontologySubproperty));
+			final QueryEngine engine = createSuccesTestSubject(Collections.singletonList(utils.ontologySubproperty));
 			engine.execQuery("An invalid query string");
 			fail("expected exception not thrown");
 		} catch (final QueryParseException e) {

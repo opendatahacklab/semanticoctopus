@@ -74,6 +74,7 @@ public class JenaQueryEngine implements QueryEngine {
 	 */
 	@Override
 	public ResultSet execQuery(final String query) throws QueryParseException {
+		System.out.println("Unsing model "+model);
 		final QueryExecution execution = QueryExecutionFactory.create(QueryFactory.create(query), model);
 		return execution.execSelect();
 	}
@@ -86,6 +87,7 @@ public class JenaQueryEngine implements QueryEngine {
 	 */
 	@Override
 	public void dispose() {
+		System.out.println("Closing model "+model);
 		model.close();
 	}
 

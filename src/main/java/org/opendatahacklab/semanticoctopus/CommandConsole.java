@@ -11,6 +11,9 @@ import java.net.URL;
 
 import org.opendatahacklab.semanticoctopus.aggregation.AggregationEngine;
 
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+
 /**
  * Command line engine to control an {@link AggregationEngine} instance
  * 
@@ -51,7 +54,7 @@ public class CommandConsole{
 
 
 	/**
-	 * Just print help
+	 * build or rebuild the knowledge base
 	 */
 	private final ConsoleCommand build = new ConsoleCommand() {
 		
@@ -110,6 +113,25 @@ public class CommandConsole{
 	};
 
 	/**
+	 * perform a sparql query
+	 */
+	private final ConsoleCommand query = new ConsoleCommand() {
+		
+		@Override
+		public boolean handle(final String command, final AggregationEngine engine, final OutputConsole out) {
+			if (!command.startsWith("query"))
+				return false;
+			final String query = command.substring("query".length()).trim();
+			final ResultSet r = engine.execQuery(query);
+			while(r.hasNext()){
+				final QuerySolution s = r.next();
+				out.println(s.toString());
+			}
+			return true;
+		}
+	};
+
+	/**
 	 * Just print help
 	 */
 	private final ConsoleCommand help = new ConsoleCommand() {
@@ -122,6 +144,7 @@ public class CommandConsole{
 			out.println("- state print the current state of the engine");
 			out.println("- list print the urls of the ontologies which will be aggregated");
 			out.println("- help print a list of available commands");
+			out.println("- query <query> perform a query against the aggregated knowledge base");
 			out.println("- exit close the engine and this executable");
 			return true;
 		}
@@ -132,7 +155,7 @@ public class CommandConsole{
 	private final AggregationEngine engine;
 	private final BufferedReader in;
 	private final OutputConsole out;
-	private final ConsoleCommand[] availableCommands = {build, state, list, info, help};
+	private final ConsoleCommand[] availableCommands = {build, state, list, info, query, help};
 	
 	/**
 	 * @param engine

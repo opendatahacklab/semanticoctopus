@@ -80,13 +80,14 @@ public class SemanticOctopus {
 	}
 
 	/**
+	 * Get the ontologies URLs from command line parameters
 	 * @param args
 	 * 
 	 * @return
 	 * 
 	 * @throws MalformedURLException
 	 */
-	private static List<URL> loadOntologies(final String[] args) throws MalformedURLException {
+	private static List<URL> getOntologiesFromArgs(final String[] args) throws MalformedURLException {
 		final int ontologyNumber = args.length - 2;
 		final List<URL> ontologies = new ArrayList<URL>(ontologyNumber);
 		for (int i = 0; i < ontologyNumber; i++)
@@ -103,7 +104,7 @@ public class SemanticOctopus {
 	 * @throws MalformedURLException
 	 */
 	private static AggregationEngine generateEngine(final String[] args) throws MalformedURLException {
-		final List<URL> ontologies = loadOntologies(args);
+		final List<URL> ontologies = getOntologiesFromArgs(args);
 		return AsyncAggregationEngine.FACTORY.create(ontologies, out);
 	}
 

@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://opendatahacklab.org/sparql_suite/sparql_processor.js"></script>
+	</head>
+<body>
+	<h1>Test the octopus</h1>
+	<p>perform a query to localhos:9003</p>
+	<script type="text/javascript">
+var processor = new Object();
+processor.query="SELECT * WHERE {?x ?y ?z} LIMIT 1";
+processor.process = function(row){
+	window.alert("Processing");
+}
+processor.flush = function(){
+	window.alert("flush");	
+}
+sparql_query('http://localhost:9003/sparql', processor);
+	</script>
+</body>
+</html>
