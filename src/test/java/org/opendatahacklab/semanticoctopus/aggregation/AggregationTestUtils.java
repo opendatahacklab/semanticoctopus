@@ -65,6 +65,7 @@ public class AggregationTestUtils {
 
 	public final URL vocabulary;
 	public final URL ontologyA;
+	public final URL ontologyAturtle;
 	public final URL ontologyB;
 	public final URL ontologyC;
 	public final URL ontologySubclass;
@@ -83,6 +84,7 @@ public class AggregationTestUtils {
 	public AggregationTestUtils() throws MalformedURLException {
 		vocabulary = new URL("http://opendatahacklab.org/semanticoctopus/testbed/V.owl");
 		ontologyA = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.owl");
+		ontologyAturtle = new URL("http://opendatahacklab.org/semanticoctopus/testbed/A.ttl");
 		ontologyB = new URL("http://opendatahacklab.org/semanticoctopus/testbed/B.owl");
 		ontologyC = new URL("http://opendatahacklab.org/semanticoctopus/testbed/C.owl");
 		ontologySubclass = new URL("http://opendatahacklab.org/semanticoctopus/testbed/subclass.owl");

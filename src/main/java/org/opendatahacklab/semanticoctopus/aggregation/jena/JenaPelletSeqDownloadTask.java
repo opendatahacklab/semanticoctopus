@@ -68,9 +68,14 @@ public class JenaPelletSeqDownloadTask implements Runnable {
 		final OntModel model = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
 		for (final URL u : ontologyURLs)
 			try {
-				out.println("Loading " + u.toExternalForm());
-				model.read(u.toExternalForm());
-				out.println("Loaded " + u.toExternalForm());
+				final String uri = u.toExternalForm();
+				out.println("Loading " + uri);
+				if (uri.endsWith(".ttl")){
+					out.println("recognized turtle");
+					model.read(uri, "http://example.org", "TURTLE");
+				} else
+					model.read(u.toExternalForm());
+				out.println("Loaded " + uri);
 			} catch (Exception e) {
 				model.close();
 				handler.error(new OntologyDownloadError(u, e));

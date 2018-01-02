@@ -150,6 +150,18 @@ public abstract class AbstractAggregationTest {
 	}
 
 	/**
+	 * Check that turtle files are correctly recognized
+	 * 
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void shouldRecognizeTurtle() throws InterruptedException {
+		final URL[] ontologies = { utils.ontologyAturtle };
+		final RelativePair[] expected = { new RelativePair(individualA, individualB) };
+		testRelatives(ontologies, expected);
+	}
+
+	/**
 	 * Check loading a multiple ontologies
 	 * 
 	 * @throws InterruptedException

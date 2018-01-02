@@ -76,6 +76,7 @@ public class JenaPelletDownloadTaskTest extends AbstractAggregationTest {
 
 					@Override
 					public void error(final OntologyDownloadError error) {
+						error.printStackTrace();
 						fail(error.getCause().getMessage());
 					}
 
